@@ -5,90 +5,136 @@
   <title>Treenihaaste</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    :root {
+      --bg: #0f0f0f;
+      --card: #1b1b1b;
+      --card-soft: #242424;
+      --accent: #4caf50;
+      --text: #eaeaea;
+      --muted: #9a9a9a;
+      --danger: #e57373;
+    }
+
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #121212;
-      color: #eaeaea;
       margin: 0;
       padding: 20px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    .card {
-      background: #1e1e1e;
-      padding: 20px;
-      border-radius: 16px;
-      max-width: 500px;
+    .container {
+      max-width: 520px;
       margin: auto;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.5);
     }
 
-    h1, h2 {
+    h1 {
       text-align: center;
-      margin-top: 0;
+      margin-bottom: 24px;
+    }
+
+    h2 {
+      margin: 28px 0 12px;
+      color: var(--accent);
+      font-size: 18px;
     }
 
     .day {
-      padding: 14px;
-      border-radius: 12px;
-      margin-bottom: 12px;
-      background: #2a2a2a;
+      background: var(--card);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      transition: transform 0.15s ease;
     }
 
-    .today {
-      border: 2px solid #4caf50;
-      background: #1b2a1f;
+    .day.today {
+      border: 2px solid var(--accent);
+      background: linear-gradient(180deg, #1c2b20, var(--card));
     }
 
-    .future {
-      opacity: 0.5;
+    .day.future {
+      opacity: 0.45;
     }
 
-    .done {
-      opacity: 0.7;
-      background: #1a1a1a;
+    .day.done {
+      background: var(--card-soft);
+      opacity: 0.75;
     }
 
-    .label {
+    .day-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
       font-weight: bold;
-      margin-bottom: 6px;
     }
 
-    button {
-      margin-top: 10px;
-      width: 100%;
-      padding: 12px;
+    .badge {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #333;
+      color: var(--muted);
+    }
+
+    .badge.today {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .exercise {
+      margin: 4px 0;
       font-size: 16px;
-      border-radius: 10px;
-      border: none;
-      background: #4caf50;
-      color: black;
-      font-weight: bold;
-    }
-
-    button:disabled {
-      background: #555;
-      color: #aaa;
     }
 
     .rest {
       font-style: italic;
-      color: #bbb;
+      color: var(--muted);
+    }
+
+    .actions {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      font-size: 15px;
+      border-radius: 12px;
+      border: none;
+      font-weight: bold;
+    }
+
+    .do-btn {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .undo-btn {
+      background: transparent;
+      border: 2px solid var(--danger);
+      color: var(--danger);
+    }
+
+    button:disabled {
+      opacity: 0.5;
     }
   </style>
 </head>
 <body>
 
-<div class="card">
+<div class="container">
   <h1>💪 3 viikon treenihaaste</h1>
   <div id="list"></div>
 </div>
 
 <script>
-  // 🔧 ALOITUSPÄIVÄ
   const startDate = new Date("2026-01-08");
   const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
-  // Treenisuunnitelma (null = lepopäivä)
   const plan = [
     { p: 5, a: 10 }, { p: 6, a: 12 }, null,
     { p: 7, a: 15 }, { p: 8, a: 18 }, null,
@@ -103,53 +149,85 @@
     { p: 30, a: 60 }
   ];
 
-  const today = new Date();
-  const todayIndex = Math.floor((today - startDate) / MS_PER_DAY);
-
+  const todayIndex = Math.floor((new Date() - startDate) / MS_PER_DAY);
   const list = document.getElementById("list");
+
+  function weekForDay(i) {
+    return Math.floor(i / 7) + 1;
+  }
 
   function render() {
     list.innerHTML = "";
+    let currentWeek = 0;
 
     plan.forEach((day, i) => {
+      const week = weekForDay(i);
+      if (week !== currentWeek) {
+        currentWeek = week;
+        const h = document.createElement("h2");
+        h.textContent = `Viikko ${week}`;
+        list.appendChild(h);
+      }
+
       const div = document.createElement("div");
       div.className = "day";
 
       const key = "done-day-" + i;
-      const isDone = localStorage.getItem(key);
+      const done = localStorage.getItem(key);
       const isToday = i === todayIndex;
       const isFuture = i > todayIndex;
 
       if (isToday) div.classList.add("today");
       if (isFuture) div.classList.add("future");
-      if (isDone) div.classList.add("done");
+      if (done) div.classList.add("done");
 
-      let content = `<div class="label">Päivä ${i + 1}</div>`;
+      let badge = "";
+      if (isToday) badge = `<span class="badge today">TÄNÄÄN</span>`;
+      else if (done) badge = `<span class="badge">SUORITETTU</span>`;
+      else badge = `<span class="badge">Päivä ${i + 1}</span>`;
+
+      let html = `
+        <div class="day-header">
+          <div>Päivä ${i + 1}</div>
+          ${badge}
+        </div>
+      `;
 
       if (day === null) {
-        content += `<div class="rest">😴 Lepopäivä</div>`;
+        html += `<div class="rest">😴 Lepopäivä</div>`;
       } else {
-        content += `
-          <div>Punnerrukset: <strong>${day.p}</strong></div>
-          <div>Vatsat: <strong>${day.a}</strong></div>
+        html += `
+          <div class="exercise">Punnerrukset: <strong>${day.p}</strong></div>
+          <div class="exercise">Vatsat: <strong>${day.a}</strong></div>
         `;
 
-        if (isToday && !isDone) {
-          content += `<button onclick="completeDay(${i})">SUORITA!</button>`;
-        }
+        if (!isFuture) {
+          html += `<div class="actions">`;
 
-        if (isDone) {
-          content += `<div class="rest">✅ Suoritettu</div>`;
+          if (!done && isToday) {
+            html += `<button class="do-btn" onclick="complete(${i})">SUORITA!</button>`;
+          }
+
+          if (done) {
+            html += `<button class="undo-btn" onclick="undo(${i})">POISTA SUORITUS</button>`;
+          }
+
+          html += `</div>`;
         }
       }
 
-      div.innerHTML = content;
+      div.innerHTML = html;
       list.appendChild(div);
     });
   }
 
-  function completeDay(i) {
+  function complete(i) {
     localStorage.setItem("done-day-" + i, "true");
+    render();
+  }
+
+  function undo(i) {
+    localStorage.removeItem("done-day-" + i);
     render();
   }
 
