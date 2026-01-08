@@ -16,36 +16,50 @@
     .card {
       background: #1e1e1e;
       padding: 20px;
-      border-radius: 14px;
-      max-width: 420px;
+      border-radius: 16px;
+      max-width: 500px;
       margin: auto;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.5);
     }
 
     h1, h2 {
-      margin-top: 0;
       text-align: center;
+      margin-top: 0;
+    }
+
+    .day {
+      padding: 14px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      background: #2a2a2a;
     }
 
     .today {
       border: 2px solid #4caf50;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 24px;
+      background: #1b2a1f;
     }
 
-    .exercise {
-      font-size: 18px;
-      margin: 6px 0;
+    .future {
+      opacity: 0.5;
+    }
+
+    .done {
+      opacity: 0.7;
+      background: #1a1a1a;
+    }
+
+    .label {
+      font-weight: bold;
+      margin-bottom: 6px;
     }
 
     button {
-      margin-top: 12px;
-      padding: 12px;
+      margin-top: 10px;
       width: 100%;
+      padding: 12px;
       font-size: 16px;
-      border: none;
       border-radius: 10px;
+      border: none;
       background: #4caf50;
       color: black;
       font-weight: bold;
@@ -56,46 +70,23 @@
       color: #aaa;
     }
 
-    .done {
-      color: #4caf50;
-      font-weight: bold;
-      margin-top: 8px;
-      text-align: center;
-    }
-
-    .upcoming {
-      margin-top: 10px;
-      padding: 12px;
-      border-radius: 10px;
-      background: #2a2a2a;
-      opacity: 0.7;
-    }
-
     .rest {
       font-style: italic;
-      color: #aaa;
-    }
-
-    .day-label {
-      font-weight: bold;
-      margin-bottom: 4px;
+      color: #bbb;
     }
   </style>
 </head>
 <body>
 
 <div class="card">
-  <h1>💪 Treenihaaste</h1>
-
-  <div id="todayBox" class="today"></div>
-
-  <h2>📆 Seuraavat päivät</h2>
-  <div id="upcomingList"></div>
+  <h1>💪 3 viikon treenihaaste</h1>
+  <div id="list"></div>
 </div>
 
 <script>
   // 🔧 ALOITUSPÄIVÄ
   const startDate = new Date("2026-01-08");
+  const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
   // Treenisuunnitelma (null = lepopäivä)
   const plan = [
@@ -112,72 +103,57 @@
     { p: 30, a: 60 }
   ];
 
-  const MS_PER_DAY = 1000 * 60 * 60 * 24;
   const today = new Date();
-  const dayIndex = Math.floor((today - startDate) / MS_PER_DAY);
+  const todayIndex = Math.floor((today - startDate) / MS_PER_DAY);
 
-  const todayBox = document.getElementById("todayBox");
-  const upcomingList = document.getElementById("upcomingList");
+  const list = document.getElementById("list");
 
-  function renderToday() {
-    if (dayIndex < 0 || dayIndex >= plan.length) {
-      todayBox.innerHTML = "<p>Haaste ei ole käynnissä.</p>";
-      return;
-    }
+  function render() {
+    list.innerHTML = "";
 
-    if (plan[dayIndex] === null) {
-      todayBox.innerHTML = `
-        <h2>😴 Lepopäivä</h2>
-        <p class="rest">Kevyt liike ja palautuminen</p>
-      `;
-      return;
-    }
-
-    const key = "done-day-" + dayIndex;
-    const done = localStorage.getItem(key);
-
-    todayBox.innerHTML = `
-      <h2>Päivä ${dayIndex + 1} / 21</h2>
-      <div class="exercise">Punnerrukset: <strong>${plan[dayIndex].p}</strong></div>
-      <div class="exercise">Vatsat: <strong>${plan[dayIndex].a}</strong></div>
-      <button id="doneBtn" ${done ? "disabled" : ""}>✅ Suoritettu</button>
-      ${done ? `<div class="done">Suoritettu!</div>` : ""}
-    `;
-
-    if (!done) {
-      document.getElementById("doneBtn").onclick = () => {
-        localStorage.setItem(key, "true");
-        renderToday();
-      };
-    }
-  }
-
-  function renderUpcoming() {
-    upcomingList.innerHTML = "";
-
-    for (let i = dayIndex + 1; i < Math.min(plan.length, dayIndex + 6); i++) {
+    plan.forEach((day, i) => {
       const div = document.createElement("div");
-      div.className = "upcoming";
+      div.className = "day";
 
-      if (plan[i] === null) {
-        div.innerHTML = `
-          <div class="day-label">Päivä ${i + 1}</div>
-          <div class="rest">😴 Lepopäivä</div>
-        `;
+      const key = "done-day-" + i;
+      const isDone = localStorage.getItem(key);
+      const isToday = i === todayIndex;
+      const isFuture = i > todayIndex;
+
+      if (isToday) div.classList.add("today");
+      if (isFuture) div.classList.add("future");
+      if (isDone) div.classList.add("done");
+
+      let content = `<div class="label">Päivä ${i + 1}</div>`;
+
+      if (day === null) {
+        content += `<div class="rest">😴 Lepopäivä</div>`;
       } else {
-        div.innerHTML = `
-          <div class="day-label">Päivä ${i + 1}</div>
-          <div>Punnerrukset: ${plan[i].p}</div>
-          <div>Vatsat: ${plan[i].a}</div>
+        content += `
+          <div>Punnerrukset: <strong>${day.p}</strong></div>
+          <div>Vatsat: <strong>${day.a}</strong></div>
         `;
+
+        if (isToday && !isDone) {
+          content += `<button onclick="completeDay(${i})">SUORITA!</button>`;
+        }
+
+        if (isDone) {
+          content += `<div class="rest">✅ Suoritettu</div>`;
+        }
       }
 
-      upcomingList.appendChild(div);
-    }
+      div.innerHTML = content;
+      list.appendChild(div);
+    });
   }
 
-  renderToday();
-  renderUpcoming();
+  function completeDay(i) {
+    localStorage.setItem("done-day-" + i, "true");
+    render();
+  }
+
+  render();
 </script>
 
 </body>
