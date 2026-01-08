@@ -46,6 +46,27 @@
       margin-bottom: 14px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.4);
       transition: transform 0.15s ease;
+      position: relative;
+    }
+
+    .day.done .user-stamps {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+    }
+
+    .user-stamp {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-size: cover;
+      background-position: center;
+      border: 2px solid var(--accent);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
 
     .day.today {
@@ -122,16 +143,151 @@
     button:disabled {
       opacity: 0.5;
     }
+
+    .auth-section {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    #login-form {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .auth-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .google-btn {
+      background: #fff;
+      color: #333;
+    }
+
+    .apple-btn {
+      background: #000;
+      color: #fff;
+      border: 1px solid #333;
+    }
+
+    .user-info {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    .sync-status {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1px solid var(--muted);
+      color: var(--muted);
+      padding: 6px 12px;
+      font-size: 12px;
+    }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>💪 3 viikon treenihaaste</h1>
+
+
+
+  <div style="position: absolute; top: 20px; right: 20px;">
+    <button id="show-auth" class="auth-btn" style="background: var(--accent); color: #000;">Kirjaudu</button>
+  </div>
+  
+
+  
+  <div id="auth-section" class="auth-section" style="display: none;">
+    <p id="login-instruction" style="margin: 8px 0; color: var(--muted); font-size: 14px;">Kirjautuminen on vapaaehtoista. Suoritukset tallennetaan joka tapauksessa omalle laitteellesi. Halutessasi voit kirjautua, jolloin kaikki muut kirjautuneet näkevät Google-profiilikuvasi. Lisäksi tiedot tallennetaan pilveen ja ne ovat siellä varmemmassa tallessa. Kirjautumalla hyväksyt tietojen tallentamisen, ja että profiilikuvasi näkyy muille käyttäjille.</p>
+    <div id="login-form">
+      <button id="google-login" class="auth-btn google-btn">
+        <span>🔍</span> Google
+      </button>
+      <button id="email-login" class="auth-btn">
+        <span>📧</span> Sähköposti
+      </button>
+    </div>
+
+    <div id="email-form" style="display: none; margin-bottom: 16px;">
+      <input type="email" id="email" placeholder="Sähköposti" style="width: 100%; padding: 8px; margin-bottom: 8px; border-radius: 6px; border: 1px solid var(--muted); background: var(--card); color: var(--text);">
+      <input type="password" id="password" placeholder="Salasana" style="width: 100%; padding: 8px; margin-bottom: 8px; border-radius: 6px; border: 1px solid var(--muted); background: var(--card); color: var(--text);">
+      <div style="display: flex; gap: 8px;">
+        <button id="signin-btn" class="auth-btn" style="background: var(--accent); color: #000; flex: 1;">Kirjaudu</button>
+        <button id="signup-btn" class="auth-btn" style="background: transparent; border: 1px solid var(--accent); color: var(--accent); flex: 1;">Rekisteröidy</button>
+      </div>
+    </div>
+
+    
+      
+    <div id="user-info" class="user-info" style="display: none;">
+      <img id="user-avatar" class="user-avatar" src="" alt="">
+      <div id="user-name"></div>
+      <button id="logout" class="logout-btn">Kirjaudu ulos</button>
+    </div>
+  </div>
+
+    <h1>💪 3 viikon treenihaaste</h1>
+  
   <div id="list"></div>
 </div>
 
-<script>
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+  import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+  // Firebase config - nämä voivat näkyä julkisesti
+  // Turvallisuus tulee Firebase Security Rules -säännöistä
+  const firebaseConfig = {
+    apiKey: "AIzaSyCTXfIiaTS1H3nFTZSWbGvx0kcOf3Lmwek",
+    authDomain: "treenihaaste-15c92.firebaseapp.com",
+    projectId: "treenihaaste-15c92",
+    storageBucket: "treenihaaste-15c92.firebasestorage.app",
+    messagingSenderId: "1031392742682",
+    appId: "1:1031392742682:web:274b1d8500ee3bb25370a3"
+  };
+
+  // Tarkista onko Firebase konfiguroitu
+  const isFirebaseConfigured = firebaseConfig.apiKey !== "AIzaSyBexample-replace-with-your-key";
+  
+  let app, auth, db;
+  if (isFirebaseConfigured) {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+  }
+  
+  let currentUser = null;
+  let unsubscribe = null;
+  let progressCache = null;
+  let lastCacheTime = 0;
+  const CACHE_DURATION = 30000; // 30 seconds
+
   const startDate = new Date("2026-01-08");
   const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
@@ -156,7 +312,108 @@
     return Math.floor(i / 7) + 1;
   }
 
-  function render() {
+  async function saveProgress(dayIndex, completed) {
+    if (currentUser && isFirebaseConfigured) {
+      try {
+        const completionDoc = doc(db, 'completions', `${currentUser.uid}_day-${dayIndex}`);
+        if (completed) {
+          await setDoc(completionDoc, {
+            userId: currentUser.uid,
+            dayIndex,
+            avatar: currentUser.photoURL || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNiIgZmlsbD0iIzAwN2FjYyIvPjx0ZXh0IHg9IjE2IiB5PSIyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMTQiPkA8L3RleHQ+PC9zdmc+',
+            name: currentUser.displayName || currentUser.email,
+            timestamp: new Date()
+          });
+        } else {
+          await setDoc(completionDoc, { deleted: true });
+        }
+        progressCache = null; // Clear cache
+      } catch (error) {
+        console.error('Sync error:', error);
+      }
+    } else {
+      if (completed) {
+        localStorage.setItem(`done-day-${dayIndex}`, JSON.stringify({
+          completed: true,
+          userAvatar: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="%234caf50"/><text x="16" y="20" text-anchor="middle" fill="white" font-size="12">✓</text></svg>'
+        }));
+      } else {
+        localStorage.removeItem(`done-day-${dayIndex}`);
+      }
+    }
+  }
+
+  async function getProgress() {
+    if (currentUser && isFirebaseConfigured) {
+      // Use cache if recent
+      const now = Date.now();
+      if (progressCache && (now - lastCacheTime) < CACHE_DURATION) {
+        return progressCache;
+      }
+
+      try {
+        const completionsRef = collection(db, 'completions');
+        const querySnapshot = await getDocs(completionsRef);
+        
+        const progress = {};
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          if (!data.deleted) {
+            const dayKey = `day-${data.dayIndex}`;
+            if (!progress[dayKey]) progress[dayKey] = {};
+            progress[dayKey][data.userId] = {
+              avatar: data.avatar,
+              name: data.name
+            };
+          }
+        });
+        
+        progressCache = progress;
+        lastCacheTime = now;
+        return progress;
+      } catch (error) {
+        console.error('Load error:', error);
+        return progressCache || {};
+      }
+    } else {
+      const progress = {};
+      plan.forEach((_, i) => {
+        const stored = localStorage.getItem(`done-day-${i}`);
+        if (stored) {
+          try {
+            const data = JSON.parse(stored);
+            progress[`day-${i}`] = { 'local': data };
+          } catch {
+            progress[`day-${i}`] = { 'local': { completed: true, userAvatar: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="%234caf50"/><text x="16" y="20" text-anchor="middle" fill="white" font-size="12">✓</text></svg>' } };
+          }
+        }
+      });
+      return progress;
+    }
+  }
+
+  async function complete(i) {
+    await saveProgress(i, true);
+    render();
+  }
+
+  async function undo(i) {
+    await saveProgress(i, false);
+    render();
+  }
+
+  async function render() {
+    const progress = await getProgress();
+    const now = new Date();
+    // Käytä Suomen aikaa (UTC+2/+3)
+    const finlandTime = new Date(now.getTime() + (2 * 60 * 60 * 1000)); // UTC+2 (talvi)
+    const todayIndex = Math.floor((finlandTime - startDate) / MS_PER_DAY);
+    
+    // Debug info
+    console.log('UTC time:', now.toISOString());
+    console.log('Finland time:', finlandTime.toISOString());
+    console.log('Today index:', todayIndex);
+    
     list.innerHTML = "";
     let currentWeek = 0;
 
@@ -172,18 +429,20 @@
       const div = document.createElement("div");
       div.className = "day";
 
-      const key = "done-day-" + i;
-      const done = localStorage.getItem(key);
+      const dayUsers = progress[`day-${i}`] || {};
+      const userCount = Object.keys(dayUsers).length;
       const isToday = i === todayIndex;
       const isFuture = i > todayIndex;
+      const currentUserDone = currentUser && dayUsers[currentUser.uid];
+      const localUserDone = !currentUser && dayUsers['local'];
 
       if (isToday) div.classList.add("today");
       if (isFuture) div.classList.add("future");
-      if (done) div.classList.add("done");
+      if (userCount > 0) div.classList.add("done");
 
       let badge = "";
       if (isToday) badge = `<span class="badge today">TÄNÄÄN</span>`;
-      else if (done) badge = `<span class="badge">SUORITETTU</span>`;
+      else if (userCount > 0) badge = `<span class="badge">SUORITETTU (${userCount})</span>`;
       else badge = `<span class="badge">Päivä ${i + 1}</span>`;
 
       let html = `
@@ -204,11 +463,11 @@
         if (!isFuture) {
           html += `<div class="actions">`;
 
-          if (!done && isToday) {
+          if (!currentUserDone && !localUserDone && isToday) {
             html += `<button class="do-btn" onclick="complete(${i})">SUORITA!</button>`;
           }
 
-          if (done) {
+          if ((currentUserDone || localUserDone) && isToday) {
             html += `<button class="undo-btn" onclick="undo(${i})">POISTA SUORITUS</button>`;
           }
 
@@ -216,22 +475,185 @@
         }
       }
 
+      // Add user stamps (only when logged in)
+      if (currentUser && userCount > 0) {
+        html += `<div class="user-stamps">`;
+        const positions = [
+          { top: '30%', left: '25%' },
+          { top: '40%', right: '30%' },
+          { top: '50%', right: '15%' },
+          { top: '25%', right: '25%' },
+          { bottom: '30%', right: '20%' },
+          { top: '35%', left: '30%' }
+        ];
+        
+        // Sekoita positiot päiväkohtaisesti
+        const dayRandom = new Array(positions.length).fill().map((_, idx) => idx);
+        for (let j = dayRandom.length - 1; j > 0; j--) {
+          const k = Math.floor(((i + 1) * 9301 + 49297) % 233280) % (j + 1);
+          [dayRandom[j], dayRandom[k]] = [dayRandom[k], dayRandom[j]];
+        }
+        
+        Object.values(dayUsers).forEach((user, index) => {
+          const pos = positions[dayRandom[index % positions.length]];
+          const rotation = Math.floor(((i + index) * 7919 + 31337) % 21) - 10;
+          const style = Object.entries(pos).map(([key, value]) => `${key}: ${value}`).join('; ') + `; transform: rotate(${rotation}deg)`;
+          html += `<div class="user-stamp" style="${style}; background-image: url(${user.avatar || user.userAvatar})"></div>`;
+        });
+        html += `</div>`;
+      }
+
       div.innerHTML = html;
       list.appendChild(div);
     });
   }
 
-  function complete(i) {
-    localStorage.setItem("done-day-" + i, "true");
+  // Auth functions
+  async function signInWithGoogle() {
+    if (!isFirebaseConfigured) return;
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      console.error('Google sign in error:', error);
+    }
+  }
+
+  async function signInWithEmail() {
+    if (!isFirebaseConfigured) return;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      console.error('Email sign in error:', error);
+      alert('Kirjautuminen epäonnistui: ' + error.message);
+    }
+  }
+
+  async function signUpWithEmail() {
+    if (!isFirebaseConfigured) return;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      console.error('Email sign up error:', error);
+      alert('Rekisteröinti epäonnistui: ' + error.message);
+    }
+  }
+
+  async function handleSignOut() {
+    if (!isFirebaseConfigured) return;
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
+  }
+
+  function updateAuthUI(user) {
+    const authSection = document.getElementById('auth-section');
+    const loginForm = document.getElementById('login-form');
+    const emailForm = document.getElementById('email-form');
+    const userInfo = document.getElementById('user-info');
+    const showBtn = document.getElementById('show-auth');
+    const loginInstruction = document.getElementById('login-instruction');
+    
+    if (!isFirebaseConfigured) {
+      authSection.style.display = 'none';
+      showBtn.style.display = 'none';
+      return;
+    }
+    
+    if (user) {
+      authSection.style.display = 'block';
+      loginForm.style.display = 'none';
+      emailForm.style.display = 'none';
+      userInfo.style.display = 'flex';
+      showBtn.style.display = 'none';
+      loginInstruction.style.display = 'none';
+      document.getElementById('user-name').textContent = user.displayName || user.email;
+      document.getElementById('user-avatar').src = user.photoURL || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="%23666"/><text x="16" y="20" text-anchor="middle" fill="white" font-size="14">👤</text></svg>';
+    } else {
+      authSection.style.display = 'none';
+      showBtn.style.display = 'block';
+      loginForm.style.display = 'flex';
+      emailForm.style.display = 'none';
+      userInfo.style.display = 'none';
+      loginInstruction.style.display = 'block';
+    }
+  }
+
+  // Show/hide auth section
+  document.getElementById('show-auth').addEventListener('click', () => {
+    const authSection = document.getElementById('auth-section');
+    const showBtn = document.getElementById('show-auth');
+    authSection.style.display = 'block';
+    showBtn.style.display = 'none';
+  });
+
+  // Show email form
+  document.getElementById('email-login').addEventListener('click', () => {
+    document.getElementById('login-form').style.display = 'none';
+    document.getElementById('email-form').style.display = 'block';
+  });
+
+  // Event listeners
+  document.getElementById('google-login').addEventListener('click', signInWithGoogle);
+  document.getElementById('signin-btn').addEventListener('click', signInWithEmail);
+  document.getElementById('signup-btn').addEventListener('click', signUpWithEmail);
+  document.getElementById('logout').addEventListener('click', handleSignOut);
+
+  // Auth state listener
+  if (isFirebaseConfigured) {
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
+      updateAuthUI(user);
+      
+      if (unsubscribe) unsubscribe();
+      
+      if (user) {
+        // Sync local data to cloud on first login
+        plan.forEach(async (_, i) => {
+          const stored = localStorage.getItem(`done-day-${i}`);
+          if (stored) {
+            try {
+              const data = JSON.parse(stored);
+              if (data.completed) {
+                const completionDoc = doc(db, 'completions', `${user.uid}_day-${i}`);
+                await setDoc(completionDoc, {
+                  userId: user.uid,
+                  dayIndex: i,
+                  avatar: user.photoURL || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNiIgZmlsbD0iIzAwN2FjYyIvPjx0ZXh0IHg9IjE2IiB5PSIyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMTQiPkA8L3RleHQ+PC9zdmc+',
+                  name: user.displayName || user.email,
+                  timestamp: new Date()
+                });
+              }
+            } catch (error) {
+              console.error('Sync error for day', i, error);
+            }
+          }
+        });
+        progressCache = null; // Clear cache after sync
+        
+        // Listen for real-time updates
+        const userDoc = doc(db, 'users', user.uid);
+        unsubscribe = onSnapshot(userDoc, (doc) => {
+          render();
+        });
+      }
+      
+      render();
+    });
+  } else {
+    updateAuthUI(null);
     render();
   }
 
-  function undo(i) {
-    localStorage.removeItem("done-day-" + i);
-    render();
-  }
-
-  render();
+  // Make functions global for onclick handlers
+  window.complete = complete;
+  window.undo = undo;
 </script>
 
 </body>
