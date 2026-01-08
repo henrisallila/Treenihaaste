@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <title>3 viikon treenihaaste</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    h1 { margin-top: 0; }
+    .done {
+      color: green;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 12px;
+      width: 100%;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background: #4CAF50;
+      color: white;
+    }
+    button:disabled {
+      background: gray;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h1>💪 Treenihaaste</h1>
+  <p id="day"></p>
+  <p><strong>Punnerrukset:</strong> <span id="pushups"></span></p>
+  <p><strong>Vatsat:</strong> <span id="abs"></span></p>
+  <button id="doneBtn">✅ Suoritettu</button>
+  <div id="status"></div>
+</div>
+
+<script>
+  // 🔧 MUUTA ALOITUSPÄIVÄ TÄHÄN (YYYY-MM-DD)
+  const startDate = new Date("2026-01-08");
+
+  const plan = [
+    { p: 5, a: 10 }, { p: 6, a: 12 }, null,
+    { p: 7, a: 15 }, { p: 8, a: 18 }, null,
+    { p: 9, a: 20 },
+
+    { p: 10, a: 22 }, { p: 12, a: 25 }, null,
+    { p: 14, a: 28 }, { p: 16, a: 32 }, null,
+    { p: 18, a: 35 },
+
+    { p: 20, a: 38 }, { p: 22, a: 42 }, null,
+    { p: 25, a: 45 }, { p: 28, a: 50 }, null,
+    { p: 30, a: 60 }
+  ];
+
+  const today = new Date();
+  const dayIndex = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+
+  const dayEl = document.getElementById("day");
+  const pushupsEl = document.getElementById("pushups");
+  const absEl = document.getElementById("abs");
+  const statusEl = document.getElementById("status");
+  const btn = document.getElementById("doneBtn");
+
+  if (dayIndex < 0 || dayIndex >= plan.length) {
+    dayEl.textContent = "Haaste ei ole käynnissä.";
+    btn.style.display = "none";
+  } else if (plan[dayIndex] === null) {
+    dayEl.textContent = "😴 Lepopäivä";
+    pushupsEl.textContent = "-";
+    absEl.textContent = "-";
+    btn.style.display = "none";
+  } else {
+    dayEl.textContent = `Päivä ${dayIndex + 1} / 21`;
+    pushupsEl.textContent = plan[dayIndex].p;
+    absEl.textContent = plan[dayIndex].a;
+
+    const key = "done-day-" + dayIndex;
+    if (localStorage.getItem(key)) {
+      statusEl.textContent = "✅ Suoritettu!";
+      statusEl.className = "done";
+      btn.disabled = true;
+    }
+
+    btn.onclick = () => {
+      localStorage.setItem(key, "true");
+      statusEl.textContent = "✅ Suoritettu!";
+      statusEl.className = "done";
+      btn.disabled = true;
+    };
+  }
+</script>
+
+</body>
+</html>
