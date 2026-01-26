@@ -286,10 +286,10 @@
     <p id="login-instruction" style="margin: 8px 0; color: var(--muted); font-size: 14px;">Kirjautuminen on vapaaehtoista. Suoritukset tallennetaan joka tapauksessa omalle laitteellesi. Halutessasi voit kirjautua, jolloin kaikki muut kirjautuneet näkevät Google-profiilikuvasi. Lisäksi tiedot tallennetaan pilveen ja ne ovat siellä varmemmassa tallessa. Kirjautumalla hyväksyt tietojen tallentamisen, ja että profiilikuvasi näkyy muille käyttäjille.</p>
     <div id="login-form">
       <button id="google-login" class="auth-btn google-btn">
-        <span>🔍</span> Google
+        Google tili
       </button>
       <button id="email-login" class="auth-btn">
-        <span>📧</span> Sähköposti
+        Muu sähköposti
       </button>
     </div>
 
@@ -520,7 +520,7 @@
 
       let badge = "";
       if (isToday) badge = `<span class="badge today">TÄNÄÄN</span>`;
-      else if (userCount > 0) badge = `<span class="badge">SUORITETTU (${userCount})</span>`;
+      else if (userCount > 0) badge = `<span class="badge">SUORITTAJAT (${userCount})</span>`;
       else badge = `<span class="badge">Päivä ${i + 1}</span>`;
 
       let html = `
