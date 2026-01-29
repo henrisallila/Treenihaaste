@@ -149,6 +149,11 @@
       margin-bottom: 16px;
     }
 
+    .auth-section.auth-loading {
+      opacity: 0;
+      pointer-events: none;
+    }
+
     #login-form {
       display: flex;
       justify-content: center;
@@ -268,6 +273,248 @@
       margin-top: 20px;
       cursor: pointer;
     }
+
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--card);
+    }
+
+    .nav-tab {
+      padding: 12px 16px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .nav-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .nav-tab:hover {
+      color: var(--text);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Challenge 2 styles */
+    .day {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      transition: transform 0.15s ease;
+      position: relative;
+    }
+
+    .day.today {
+      border: 2px solid var(--accent);
+      background: linear-gradient(180deg, #1c2b20, var(--card));
+    }
+
+    .day.future {
+      opacity: 0.45;
+    }
+
+    .day.completed {
+      background: var(--card-soft);
+      opacity: 0.75;
+    }
+
+    .day.rest-day {
+      opacity: 0.6;
+      border-left: 4px solid var(--muted);
+    }
+
+    .day.failed {
+      background: linear-gradient(180deg, #2b1c1c, var(--card));
+      border-left: 4px solid var(--warning);
+    }
+
+    .day-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    .badge {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #333;
+      color: var(--muted);
+    }
+
+    .badge.today {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .badge.completed {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .badge.failed {
+      background: var(--warning);
+      color: #000;
+    }
+
+    .badge.rest {
+      background: var(--accent-blue);
+      color: #fff;
+    }
+
+    .exercise {
+      margin: 4px 0;
+      font-size: 16px;
+    }
+
+    .rest-label {
+      font-style: italic;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .actions {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .success-btn {
+      background: var(--accent);
+      color: #000;
+      flex: 1;
+      min-width: 100px;
+      padding: 10px 12px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .fail-btn {
+      background: var(--warning);
+      color: #000;
+      flex: 1;
+      min-width: 100px;
+      padding: 10px 12px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .rest-btn {
+      background: var(--accent-blue);
+      color: #fff;
+      flex: 1;
+      min-width: 100px;
+      padding: 10px 12px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .undo-btn {
+      background: transparent;
+      border: 2px solid var(--danger);
+      color: var(--danger);
+      flex: 1;
+      min-width: 100px;
+      padding: 10px 12px;
+      font-size: 14px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: var(--card);
+      padding: 30px;
+      border-radius: 16px;
+      max-width: 400px;
+      width: 90%;
+      border: 2px solid var(--accent);
+    }
+
+    .modal-content h3 {
+      margin-top: 0;
+      color: var(--accent);
+      font-size: 20px;
+    }
+
+    .input-group {
+      margin: 15px 0;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 10px;
+      background: var(--card-soft);
+      border: 1px solid var(--muted);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .modal-actions button {
+      flex: 1;
+    }
+
+    :root {
+      --accent-blue: #2196F3;
+      --warning: #ff9800;
+    }
   </style>
 </head>
 <body>
@@ -277,13 +524,13 @@
 
 
   <div style="position: absolute; top: 20px; right: 20px;">
-    <button id="show-auth" class="auth-btn" style="background: var(--accent); color: #000;">Kirjaudu</button>
+    <button id="show-auth" class="auth-btn" style="background: var(--accent); color: #000; opacity: 0; transition: opacity 0.2s;">Kirjaudu</button>
   </div>
   
 
   
-  <div id="auth-section" class="auth-section" style="display: none;">
-    <p id="login-instruction" style="margin: 8px 0; color: var(--muted); font-size: 14px;">Kirjautuminen on vapaaehtoista. Suoritukset tallennetaan joka tapauksessa omalle laitteellesi. Halutessasi voit kirjautua, jolloin kaikki muut kirjautuneet näkevät Google-profiilikuvasi. Lisäksi tiedot tallennetaan pilveen ja ne ovat siellä varmemmassa tallessa. Kirjautumalla hyväksyt tietojen tallentamisen, ja että profiilikuvasi näkyy muille käyttäjille.</p>
+  <div id="auth-section" class="auth-section auth-loading" style="display: none;">
+    <p id="login-instruction" style="margin: 8px 0; color: var(--muted); font-size: 14px;">Huom! Kaikki muut kirjautuneet käyttäjät näkevät, nimesi, profiilikuvasi ja tekemäsi treenit. Kirjautumalla hyväksyt tietojen tallentamisen, ja profiilikuvasi näkymisen muille käyttäjille.</p>
     <div id="login-form">
       <button id="google-login" class="auth-btn google-btn">
         Google tili
@@ -311,9 +558,52 @@
     </div>
   </div>
 
-    <h1>💪 3 viikon treenihaaste</h1>
+    <h1>💪 Treenihaasteet</h1>
   
-  <div id="list"></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-tab="current">Nykyinen haaste</button>
+    <button class="nav-tab" data-tab="archive">Vanhat haasteet</button>
+  </div>
+
+  <div id="current" class="tab-content active">
+    <h2 style="margin-top: 0;">💪 One-shot haaste</h2>
+    
+    <!-- Login required notice -->
+    <div id="login-required" style="display: none; opacity: 0; transition: opacity 0.2s; text-align: center; padding: 40px 20px; background: var(--card); border-radius: 16px; margin: 20px 0;">
+      <div style="font-size: 48px; margin-bottom: 16px;">🔒</div>
+      <h3 style="color: var(--accent); margin-bottom: 12px;">Kirjautuminen vaaditaan</h3>
+      <p style="color: var(--muted); margin-bottom: 20px;">Sinun täytyy kirjautua sisään aloittaaksesi One-shot haasteen. Kirjautumalla varmistat että edistymisesi tallennetaan turvallisesti pilveen.</p>
+      <button onclick="document.getElementById('show-auth').click()" style="padding: 12px 24px; background: var(--accent); color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px;">
+        Kirjaudu sisään
+      </button>
+    </div>
+    
+    <div id="challenge2-list"></div>
+
+    <!-- Fail Modal -->
+    <div id="fail-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <h3>Kuinka monta harjoitetta sait tehtyä?</h3>
+        <div class="input-group">
+          <label>Punnerrukset (kpl):</label>
+          <input type="number" id="fail-pushups" min="0" placeholder="0">
+        </div>
+        <div class="input-group">
+          <label>Vatsalihakset (kpl):</label>
+          <input type="number" id="fail-situps" min="0" placeholder="0">
+        </div>
+        <div class="modal-actions">
+          <button class="fail-btn" onclick="submitChallenge2Fail()">Tallenna tulokset</button>
+          <button class="undo-btn" onclick="closeChallenge2Fail()">Peruuta</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="archive" class="tab-content">
+    <h2 style="margin-top: 0;">3 viikon treenihaaste</h2>
+    <div id="list"></div>
+  </div>
   
   <!-- Certificate Modal -->
   <div id="certificate-modal" class="certificate-modal" style="display: none;">
@@ -335,7 +625,7 @@
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
   import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-  import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+  import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, getDocs, query, where, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
   // Firebase config - nämä voivat näkyä julkisesti
   // Turvallisuus tulee Firebase Security Rules -säännöistä
@@ -643,6 +933,9 @@
     const showBtn = document.getElementById('show-auth');
     const loginInstruction = document.getElementById('login-instruction');
     
+    // Poistetaan loading-tila kun autentikaatio on tarkistettu
+    authSection.classList.remove('auth-loading');
+    
     if (!isFirebaseConfigured) {
       authSection.style.display = 'none';
       showBtn.style.display = 'none';
@@ -655,12 +948,14 @@
       emailForm.style.display = 'none';
       userInfo.style.display = 'flex';
       showBtn.style.display = 'none';
+      showBtn.style.opacity = '0';
       loginInstruction.style.display = 'none';
       document.getElementById('user-name').textContent = user.displayName || user.email;
       document.getElementById('user-avatar').src = user.photoURL || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="%23666"/><text x="16" y="20" text-anchor="middle" fill="white" font-size="14">👤</text></svg>';
     } else {
       authSection.style.display = 'none';
       showBtn.style.display = 'block';
+      showBtn.style.opacity = '1';
       loginForm.style.display = 'flex';
       emailForm.style.display = 'none';
       userInfo.style.display = 'none';
@@ -718,20 +1013,51 @@
             }
           }
         });
+        
+        // Sync challenge2 local data to cloud
+        challenge2Plan.forEach(async (_, i) => {
+          const stored = localStorage.getItem(`challenge2-day-${i}`);
+          if (stored) {
+            try {
+              const data = JSON.parse(stored);
+              const completionDoc = doc(db, 'challenge2', `${user.uid}_day-${i}`);
+              await setDoc(completionDoc, {
+                userId: user.uid,
+                dayIndex: i,
+                status: data.status,
+                pushups: data.pushups || 0,
+                situps: data.situps || 0,
+                avatar: user.photoURL || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNiIgZmlsbD0iIzAwN2FjYyIvPjx0ZXh0IHg9IjE2IiB5PSIyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMTQiPkA8L3RleHQ+PC9zdmc+',
+                name: user.displayName || user.email,
+                timestamp: new Date()
+              });
+            } catch (error) {
+              console.error('Challenge2 sync error for day', i, error);
+            }
+          }
+        });
+        
         progressCache = null; // Clear cache after sync
+        challenge2ProgressCache = null; // Clear challenge2 cache
         
         // Listen for real-time updates
         const userDoc = doc(db, 'users', user.uid);
         unsubscribe = onSnapshot(userDoc, (doc) => {
           render();
+          challenge2Render();
         });
       }
       
       render();
+      challenge2Render();
     });
   } else {
     updateAuthUI(null);
     render();
+    // Don't render challenge2 if Firebase not configured - will show login screen
+    if (isFirebaseConfigured) {
+      challenge2Render();
+    }
   }
 
   // Make functions global for onclick handlers
@@ -849,6 +1175,518 @@
   window.showCertificate = showCertificate;
   window.closeCertificate = closeCertificate;
   window.downloadImage = downloadImage;
+
+  // ===== CHALLENGE 2 LOGIC =====
+  const challenge2Plan = [
+    { p: 10, a: 15 }, { p: 12, a: 18 }, { p: 14, a: 20 }, { p: 16, a: 25 },
+    { p: 12, a: 20 }, { p: 15, a: 22 }, { p: 18, a: 25 }, { p: 20, a: 30 },
+    { p: 15, a: 25 }, { p: 18, a: 28 }, { p: 20, a: 32 }, { p: 25, a: 35 },
+    { p: 18, a: 30 }, { p: 20, a: 32 }, { p: 25, a: 35 }, { p: 30, a: 40 },
+  ];
+
+  const challenge2StartDate = new Date("2026-01-29");
+  let challenge2FailingDayIndex = null;
+  let challenge2ProgressCache = null;
+  let challenge2LastCacheTime = 0;
+
+  function challenge2WeekForDay(i) {
+    return Math.floor(i / 4) + 1;
+  }
+
+  async function challenge2SaveProgress(dayIndex, status, data = {}) {
+    if (currentUser && isFirebaseConfigured) {
+      try {
+        const completionDoc = doc(db, 'challenge2', `${currentUser.uid}_day-${dayIndex}`);
+        await setDoc(completionDoc, {
+          userId: currentUser.uid,
+          dayIndex,
+          status,
+          pushups: data.pushups || 0,
+          situps: data.situps || 0,
+          avatar: currentUser.photoURL || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNiIgZmlsbD0iIzAwN2FjYyIvPjx0ZXh0IHg9IjE2IiB5PSIyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMTQiPkA8L3RleHQ+PC9zdmc+',
+          name: currentUser.displayName || currentUser.email,
+          timestamp: new Date()
+        });
+        challenge2ProgressCache = null;
+      } catch (error) {
+        console.error('Challenge2 Save error:', error);
+      }
+    } else {
+      localStorage.setItem(`challenge2-day-${dayIndex}`, JSON.stringify({
+        status,
+        pushups: data.pushups || 0,
+        situps: data.situps || 0,
+        timestamp: new Date().toISOString(),
+        userAvatar: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="%234caf50"/><text x="16" y="20" text-anchor="middle" fill="white" font-size="12">✓</text></svg>'
+      }));
+    }
+  }
+
+  async function challenge2GetProgress() {
+    if (currentUser && isFirebaseConfigured) {
+      const now = Date.now();
+      if (challenge2ProgressCache && (now - challenge2LastCacheTime) < CACHE_DURATION) {
+        return challenge2ProgressCache;
+      }
+
+      try {
+        const completionsRef = collection(db, 'challenge2');
+        const querySnapshot = await getDocs(completionsRef);
+        
+        const progress = {};
+        querySnapshot.forEach((docSnapshot) => {
+          const data = docSnapshot.data();
+          if (data.deleted) return;
+          const dayKey = `day-${data.dayIndex}`;
+          if (!progress[dayKey]) progress[dayKey] = {};
+          progress[dayKey][data.userId] = {
+            status: data.status,
+            pushups: data.pushups || 0,
+            situps: data.situps || 0,
+            avatar: data.avatar,
+            name: data.name,
+            timestamp: data.timestamp
+          };
+        });
+        
+        challenge2ProgressCache = progress;
+        challenge2LastCacheTime = now;
+        return progress;
+      } catch (error) {
+        console.error('Challenge2 Load error:', error);
+        return challenge2ProgressCache || {};
+      }
+    } else {
+      const progress = {};
+      challenge2Plan.forEach((_, i) => {
+        const stored = localStorage.getItem(`challenge2-day-${i}`);
+        if (stored) {
+          try {
+            const data = JSON.parse(stored);
+            progress[`day-${i}`] = { 'local': data };
+          } catch {}
+        }
+      });
+      return progress;
+    }
+  }
+
+  function challenge2HasCompletedToday(progress) {
+    const now = new Date();
+    const finlandTime = new Date(now.getTime() + (2 * 60 * 60 * 1000));
+    
+    // Calculate today's start and end in UTC based on Finland date
+    const todayStart = new Date(Date.UTC(finlandTime.getUTCFullYear(), finlandTime.getUTCMonth(), finlandTime.getUTCDate()) - (2 * 60 * 60 * 1000));
+    const todayEnd = new Date(todayStart.getTime() + MS_PER_DAY);
+    
+    console.log('Checking completions today. Current time:', now.toISOString());
+    console.log('Today range (UTC):', todayStart.toISOString(), '-', todayEnd.toISOString());
+    
+    for (let i = 0; i < challenge2Plan.length; i++) {
+      const dayUsers = progress[`day-${i}`] || {};
+      const currentUserData = currentUser ? dayUsers[currentUser.uid] : dayUsers['local'];
+      
+      if (currentUserData && currentUserData.timestamp) {
+        const completionDate = currentUserData.timestamp.toDate ? currentUserData.timestamp.toDate() : new Date(currentUserData.timestamp);
+        console.log(`Day ${i} completed at:`, completionDate.toISOString());
+        if (completionDate >= todayStart && completionDate < todayEnd) {
+          console.log('Found completion today!');
+          return true;
+        }
+      }
+    }
+    console.log('No completions today');
+    return false;
+  }
+
+  function challenge2IsFailedToday(dayIndex, progress) {
+    const dayUsers = progress[`day-${dayIndex}`] || {};
+    const currentUserData = currentUser ? dayUsers[currentUser.uid] : dayUsers['local'];
+    
+    if (!currentUserData || currentUserData.status !== 'failed' || !currentUserData.timestamp) {
+      return false;
+    }
+    
+    const now = new Date();
+    const finlandTime = new Date(now.getTime() + (2 * 60 * 60 * 1000));
+    const todayStart = new Date(Date.UTC(finlandTime.getUTCFullYear(), finlandTime.getUTCMonth(), finlandTime.getUTCDate()) - (2 * 60 * 60 * 1000));
+    const todayEnd = new Date(todayStart.getTime() + MS_PER_DAY);
+    
+    const failDate = currentUserData.timestamp.toDate ? currentUserData.timestamp.toDate() : new Date(currentUserData.timestamp);
+    return failDate >= todayStart && failDate < todayEnd;
+  }
+
+  async function challenge2CompleteSuccess(i) {
+    await challenge2SaveProgress(i, 'success');
+    challenge2ProgressCache = null; // Force reload from database
+    await challenge2Render();
+  }
+
+  function openChallenge2Fail(i) {
+    challenge2FailingDayIndex = i;
+    document.getElementById('fail-pushups').value = '';
+    document.getElementById('fail-situps').value = '';
+    document.getElementById('fail-modal').style.display = 'flex';
+  }
+
+  function closeChallenge2Fail() {
+    document.getElementById('fail-modal').style.display = 'none';
+    challenge2FailingDayIndex = null;
+  }
+
+  async function submitChallenge2Fail() {
+    if (challenge2FailingDayIndex === null) return;
+    
+    const pushups = parseInt(document.getElementById('fail-pushups').value) || 0;
+    const situps = parseInt(document.getElementById('fail-situps').value) || 0;
+    
+    await challenge2SaveProgress(challenge2FailingDayIndex, 'failed', { pushups, situps });
+    challenge2ProgressCache = null; // Force reload from database
+    closeChallenge2Fail();
+    await challenge2Render();
+  }
+
+  async function challenge2Undo(i) {
+    if (currentUser && isFirebaseConfigured) {
+      try {
+        const completionDoc = doc(db, 'challenge2', `${currentUser.uid}_day-${i}`);
+        await deleteDoc(completionDoc);
+      } catch (error) {
+        console.error('Challenge2 Undo error:', error);
+      }
+    } else {
+      localStorage.removeItem(`challenge2-day-${i}`);
+    }
+    challenge2ProgressCache = null; // Force reload
+    await challenge2Render();
+  }
+
+  async function challenge2Render() {
+    const list = document.getElementById('challenge2-list');
+    const loginRequired = document.getElementById('login-required');
+    
+    // Check if Firebase is configured and user is logged in
+    if (!isFirebaseConfigured || !currentUser) {
+      if (list) list.style.display = 'none';
+      if (loginRequired) {
+        loginRequired.style.display = 'block';
+        loginRequired.style.opacity = '1';
+      }
+      return;
+    }
+    
+    if (list) list.style.display = 'block';
+    if (loginRequired) {
+      loginRequired.style.display = 'none';
+      loginRequired.style.opacity = '0';
+    }
+    
+    const progress = await challenge2GetProgress();
+    const hasCompletedToday = challenge2HasCompletedToday(progress);
+    
+    // Calculate streak (consecutive successful days, rest days don't break it)
+    let streak = 0;
+    const now = new Date();
+    const finlandTime = new Date(now.getTime() + (2 * 60 * 60 * 1000));
+    
+    // Count backwards from today to find consecutive successful days
+    for (let dayOffset = 0; dayOffset <= challenge2Plan.length; dayOffset++) {
+      const checkDate = new Date(finlandTime);
+      checkDate.setDate(checkDate.getDate() - dayOffset);
+      
+      // Find if any day was completed with success status on this date
+      let foundSuccess = false;
+      let foundFailure = false;
+      
+      for (let i = 0; i < challenge2Plan.length; i++) {
+        const dayUsers = progress[`day-${i}`] || {};
+        const currentUserData = currentUser ? dayUsers[currentUser.uid] : dayUsers['local'];
+        
+        if (currentUserData && currentUserData.timestamp) {
+          const completionDate = currentUserData.timestamp.toDate ? currentUserData.timestamp.toDate() : new Date(currentUserData.timestamp);
+          const completionDay = new Date(completionDate.getTime() + (2 * 60 * 60 * 1000));
+          
+          if (completionDay.getUTCFullYear() === checkDate.getUTCFullYear() &&
+              completionDay.getUTCMonth() === checkDate.getUTCMonth() &&
+              completionDay.getUTCDate() === checkDate.getUTCDate()) {
+            if (currentUserData.status === 'success') {
+              foundSuccess = true;
+            } else if (currentUserData.status === 'failed') {
+              foundFailure = true;
+            }
+            break;
+          }
+        }
+      }
+      
+      if (foundSuccess) {
+        streak++;
+      } else if (foundFailure) {
+        // Failed day breaks the streak
+        break;
+      }
+      // Rest day (no completion) doesn't break streak, continue counting
+    }
+    
+    // Calculate consecutive workout days (success or failed) without rest
+    let consecutiveDays = 0;
+    
+    // Count backwards from yesterday to find consecutive workout days
+    for (let dayOffset = 1; dayOffset <= challenge2Plan.length; dayOffset++) {
+      const checkDate = new Date(finlandTime);
+      checkDate.setDate(checkDate.getDate() - dayOffset);
+      
+      // Find if any day was completed on this date
+      let foundCompletion = false;
+      for (let i = 0; i < challenge2Plan.length; i++) {
+        const dayUsers = progress[`day-${i}`] || {};
+        const currentUserData = currentUser ? dayUsers[currentUser.uid] : dayUsers['local'];
+        
+        if (currentUserData && currentUserData.timestamp) {
+          const completionDate = currentUserData.timestamp.toDate ? currentUserData.timestamp.toDate() : new Date(currentUserData.timestamp);
+          const completionDay = new Date(completionDate.getTime() + (2 * 60 * 60 * 1000));
+          
+          if (completionDay.getUTCFullYear() === checkDate.getUTCFullYear() &&
+              completionDay.getUTCMonth() === checkDate.getUTCMonth() &&
+              completionDay.getUTCDate() === checkDate.getUTCDate()) {
+            foundCompletion = true;
+            break;
+          }
+        }
+      }
+      
+      if (foundCompletion) {
+        consecutiveDays++;
+      } else {
+        break; // Rest day found, stop counting
+      }
+    }
+    
+    // Find first incomplete or failed day for current user
+    let todayIndex = -1;
+    for (let i = 0; i < challenge2Plan.length; i++) {
+      const dayUsers = progress[`day-${i}`] || {};
+      const currentUserData = currentUser ? dayUsers[currentUser.uid] : dayUsers['local'];
+      
+      if (!currentUserData || currentUserData.status === 'failed') {
+        todayIndex = i;
+        break;
+      }
+    }
+    
+    // If all completed, no "today"
+    if (todayIndex === -1) {
+      todayIndex = challenge2Plan.length; // Beyond last day
+    }
+    
+    list.innerHTML = "";
+    
+    // Show streak if >= 2
+    if (streak >= 2) {
+      const streakDiv = document.createElement("div");
+      streakDiv.style.cssText = "margin-bottom: 20px; padding: 16px; background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); border-radius: 12px; color: #000; text-align: center; box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);";
+      streakDiv.innerHTML = `
+        <div style="font-size: 32px; margin-bottom: 8px;">🔥</div>
+        <div style="font-weight: bold; font-size: 20px; margin-bottom: 4px;">${streak} päivän putki!</div>
+        <div style="font-size: 14px; opacity: 0.8;">Peräkkäisiä onnistuneita treenejä (lepopäivät eivät katkaise putkea)</div>
+      `;
+      list.appendChild(streakDiv);
+    }
+    
+    // Show rest day reminder if 3+ consecutive days without rest
+    if (consecutiveDays >= 3 && todayIndex < challenge2Plan.length) {
+      const reminder = document.createElement("div");
+      reminder.style.cssText = "margin-bottom: 20px; padding: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; color: white; text-align: center;";
+      reminder.innerHTML = `
+        <div style="font-size: 24px; margin-bottom: 8px;">😴</div>
+        <div style="font-weight: bold; margin-bottom: 4px;">Olet treenannut ${consecutiveDays} päivää peräkkäin!</div>
+        <div style="font-size: 14px; opacity: 0.9;">Muista pitää välillä lepopäivä. Palautuminen on tärkeä osa kehitystä!</div>
+      `;
+      list.appendChild(reminder);
+    }
+    
+    let currentWeek = 0;
+
+    challenge2Plan.forEach((day, i) => {
+      const week = challenge2WeekForDay(i);
+      if (week !== currentWeek) {
+        currentWeek = week;
+        const h = document.createElement("h3");
+        h.textContent = `Viikko ${week}`;
+        h.style.color = 'var(--accent)';
+        h.style.fontSize = '16px';
+        h.style.margin = '20px 0 12px';
+        list.appendChild(h);
+      }
+
+      const div = document.createElement("div");
+      div.className = "day";
+
+      const dayUsers = progress[`day-${i}`] || {};
+      const userCount = Object.keys(dayUsers).length;
+      const isToday = i === todayIndex;
+      const isFuture = i > todayIndex;
+      const currentUserData = currentUser ? dayUsers[currentUser.uid] : dayUsers['local'];
+
+      if (isToday) div.classList.add("today");
+      if (isFuture) div.classList.add("future");
+      if (userCount > 0) div.classList.add("done");
+
+      let badge = "";
+      let status = "Suorittamatta";
+
+      if (currentUserData) {
+        if (currentUserData.status === 'success') {
+          div.classList.add("completed");
+          badge = `<span class="badge completed">SUORITETTU</span>`;
+          status = "✅ Suoritettu";
+        } else if (currentUserData.status === 'failed') {
+          div.classList.add("failed");
+          badge = `<span class="badge failed">EPÄONNISTUI</span>`;
+          status = `⚠️ Epäonnistui (${currentUserData.pushups} punnerrusta  + ${currentUserData.situps} vatsaa)`;
+        }
+      } else if (isToday && hasCompletedToday) {
+        badge = `<span class="badge">HUOMENNA</span>`;
+      } else if (isToday) {
+        badge = `<span class="badge today">TÄNÄÄN</span>`;
+      } else if (userCount > 0) {
+        badge = `<span class="badge">SUORITTAJAT (${userCount})</span>`;
+      } else {
+        badge = `<span class="badge">Päivä ${i + 1}</span>`;
+      }
+
+      let html = `
+        <div class="day-header">
+          <div>Päivä ${i + 1}</div>
+          ${badge}
+        </div>
+        <div class="exercise">Punnerrukset: <strong>${day.p}</strong></div>
+        <div class="exercise">Vatsat: <strong>${day.a}</strong></div>
+
+      `;
+
+      // Show all users' results
+      if (userCount > 0) {
+        html += `<div style="margin-top: 12px; padding: 10px; background: var(--card-soft); border-radius: 8px; font-size: 14px;">`;
+        html += `<div style="font-weight: bold; margin-bottom: 6px; color: var(--accent);">Suorittajat:</div>`;
+        Object.values(dayUsers).forEach(user => {
+          const userName = user.name || 'Käyttäjä';
+          if (user.status === 'success') {
+            html += `<div style="margin: 4px 0;">✅ ${userName}</div>`;
+          } else if (user.status === 'failed') {
+            html += `<div style="margin: 4px 0;">⚠️ ${userName} (${user.pushups} punnerrusta ja ${user.situps} vatsaa)</div>`;
+          }
+        });
+        html += `</div>`;
+      }
+
+      // Check if this day was completed today (for undo button)
+      const isCompletedToday = currentUserData && currentUserData.timestamp && (() => {
+        const now = new Date();
+        const finlandTime = new Date(now.getTime() + (2 * 60 * 60 * 1000));
+        const todayStart = new Date(Date.UTC(finlandTime.getUTCFullYear(), finlandTime.getUTCMonth(), finlandTime.getUTCDate()) - (2 * 60 * 60 * 1000));
+        const todayEnd = new Date(todayStart.getTime() + MS_PER_DAY);
+        const completionDate = currentUserData.timestamp.toDate ? currentUserData.timestamp.toDate() : new Date(currentUserData.timestamp);
+        return completionDate >= todayStart && completionDate < todayEnd;
+      })();
+
+      // Show buttons only if it's today's task and no completion today
+      if (isToday && !hasCompletedToday) {
+        if (!currentUserData) {
+          html += `<div class="actions">
+            <button class="success-btn" onclick="challenge2CompleteSuccess(${i})">✅ Suoritettu</button>
+            <button class="fail-btn" onclick="openChallenge2Fail(${i})">❌ Epäonnistui</button>
+          </div>`;
+        } else if (currentUserData.status === 'failed') {
+          const isFailedToday = challenge2IsFailedToday(i, progress);
+          if (isFailedToday) {
+            html += `<div class="actions">
+              <button class="fail-btn" onclick="openChallenge2Fail(${i})">Muokkaa tuloksia</button>
+              <button class="undo-btn" onclick="challenge2Undo(${i})">Kumoa</button>
+            </div>`;
+          } else {
+            html += `<div style="margin-top: 8px; color: var(--accent); font-weight: bold;">🔄 Yritä uudelleen</div>`;
+            html += `<div class="actions">
+              <button class="success-btn" onclick="challenge2CompleteSuccess(${i})">✅ Suoritettu</button>
+              <button class="fail-btn" onclick="openChallenge2Fail(${i})">❌ Epäonnistui</button>
+            </div>`;
+          }
+        }
+      } else if (isToday && hasCompletedToday) {
+        html += `<div style="margin-top: 12px; padding: 10px; background: var(--card-soft); border-radius: 8px; color: var(--muted); font-size: 14px;">
+          ⏸️ Olet jo tehnyt suorituksen tänään. Voit jatkaa haastetta huomenna!
+        </div>`;
+      } else if (!isToday && !isFuture && isCompletedToday) {
+        // Show undo button for days completed today (even if they're no longer "today")
+        html += `<div class="actions">
+          <button class="undo-btn" onclick="challenge2Undo(${i})">Kumoa</button>
+        </div>`;
+      } else if (isFuture) {
+        html += `<div style="margin-top: 12px; padding: 10px; background: var(--card-soft); border-radius: 8px; color: var(--muted); font-size: 14px;">
+          🔒 Suorita ensin aikaisemmat päivät
+        </div>`;
+      }
+
+      // Add user stamps (only when logged in and for successful completions in challenge2)
+      if (currentUser && userCount > 0) {
+        const successfulUsers = Object.values(dayUsers).filter(user => user.status === 'success');
+        if (successfulUsers.length > 0) {
+          html += `<div class="user-stamps">`;
+          const positions = [
+            { top: '30%', left: '25%' },
+            { top: '40%', right: '30%' },
+            { top: '50%', right: '15%' },
+            { top: '25%', right: '25%' },
+            { bottom: '30%', right: '20%' },
+            { top: '35%', left: '30%' }
+          ];
+          
+          // Sekoita positiot päiväkohtaisesti
+          const dayRandom = new Array(positions.length).fill().map((_, idx) => idx);
+          for (let j = dayRandom.length - 1; j > 0; j--) {
+            const k = Math.floor(((i + 1) * 9301 + 49297) % 233280) % (j + 1);
+            [dayRandom[j], dayRandom[k]] = [dayRandom[k], dayRandom[j]];
+          }
+          
+          successfulUsers.forEach((user, index) => {
+            const pos = positions[dayRandom[index % positions.length]];
+            const rotation = Math.floor(((i + index) * 7919 + 31337) % 21) - 10;
+            const style = Object.entries(pos).map(([key, value]) => `${key}: ${value}`).join('; ') + `; transform: rotate(${rotation}deg)`;
+            html += `<div class="user-stamp" style="${style}; background-image: url(${user.avatar || user.userAvatar})"></div>`;
+          });
+          html += `</div>`;
+        }
+      }
+
+      div.innerHTML = html;
+      list.appendChild(div);
+    });
+  }
+
+  // Global functions for challenge 2
+  window.challenge2CompleteSuccess = challenge2CompleteSuccess;
+  window.openChallenge2Fail = openChallenge2Fail;
+  window.closeChallenge2Fail = closeChallenge2Fail;
+  window.submitChallenge2Fail = submitChallenge2Fail;
+  window.challenge2Undo = challenge2Undo;
+
+  // Render challenge 2 on init
+  challenge2Render();
+
+  // Tab navigation
+  document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const tabName = tab.getAttribute('data-tab');
+      
+      // Update active tab
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      
+      // Update active content
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      document.getElementById(tabName).classList.add('active');
+    });
+  });
 </script>
 
 </body>
