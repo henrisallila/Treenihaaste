@@ -562,6 +562,7 @@
   
   <div class="nav-tabs">
     <button class="nav-tab active" data-tab="current">Nykyinen haaste</button>
+    <button class="nav-tab" data-tab="rules">Säännöt</button>
     <button class="nav-tab" data-tab="archive">Vanhat haasteet</button>
   </div>
 
@@ -597,6 +598,63 @@
           <button class="undo-btn" onclick="closeChallenge2Fail()">Peruuta</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div id="rules" class="tab-content">
+    <h2 style="margin-top: 0;">📋 One-shot haasteen säännöt</h2>
+    
+    <div style="background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 16px;">
+      <h3 style="color: var(--accent); margin-top: 0;">🎯 Tavoite</h3>
+      <p style="font-size: 18px; margin: 12px 0;"><strong>Tee 30 punnerrusta ja 50 vatsalihasliikettä <u>yhdellä kertaa</u> (one-shot)!</strong></p>
+      <p>Haaste kasvattaa suoritustasi asteittain. Aloita pienestä (7 punnerrusta), kunnes pystyt tekemään lopulta 30 punnerrusta ja 50 vatsalihasliikettä peräkkäin yhdessä istunnossa. Tempo riippuu sinusta ja kuinka nopeasti kuntosi kehittyy. Se vaatii sitkeyttä ja päättäväisyyttä!</p>
+    </div>
+
+    <div style="background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 16px;">
+      <h3 style="color: var(--accent); margin-top: 0;">📅 Kesto ja rakenne</h3>
+      <ul style="margin: 12px 0;">
+        <li><strong>Todellinen kesto:</strong> Riippuu sinusta! Voi kestää muutamasta viikosta useisiin kuukausiin riippuen kunnosta ja lepopäivistä</li>
+        <li><strong>Lepopäivät:</strong> Voit pitää lepopäiviä ilman että putki katkeaa</li>
+        <li><strong>Uudelleen yritys:</strong> Epäonnistumisen jälkeen voit yrittää uudelleen seuraavana päivänä</li>
+        <li><strong>Yksi suoritus per päivä:</strong> Voit tehdä vain yhden suorituksen per päivä</li>
+        <li><strong>Päivittäinen nousu:</strong> Punnerrukset nousevat tasaisesti 1 per aktiivinen suorituspäivä</li>
+      </ul>
+    </div>
+
+    <div style="background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 16px;">
+      <h3 style="color: var(--accent); margin-top: 0;">✅ Suoritus ja epäonnistuminen</h3>
+      <ul style="margin: 12px 0;">
+        <li><strong>Suoritettu:</strong> Merkitse päivä onnistuneeksi, kun olet suorittanut vaaditut liikkeet</li>
+        <li><strong>Epäonnistui:</strong> Jos et saa tehtyä kaikkea, voit merkitä kuinka monta sait aikaan</li>
+        <li><strong>Uudelleenyritys:</strong> Voit yrittää epäonnistuneet päivät seuraavana päivänä uudelleen</li>
+        <li><strong>Kumoa:</strong> Voit peruuttaa minkä tahansa merkinnän kumoa-napilla</li>
+      </ul>
+    </div>
+
+    <div style="background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 16px;">
+      <h3 style="color: var(--accent); margin-top: 0;">🔥 Putki ja motivaatio</h3>
+      <ul style="margin: 12px 0;">
+        <li><strong>Putki:</strong> Näet kuinka moneen päivään olet onnistunut peräkkäin</li>
+        <li><strong>Lepopäivät:</strong> Putki jatkuu vaikka pitäisit tauon, mutta epäonnistuminen katkaisee sen</li>
+        <li><strong>Lepomuistutus:</strong> Jos olet treenannut 3+ päivää peräkkäin, saat muistutuksen levosta (putki ei katkea)</li>
+        <li><strong>Palaa takaisin -viesti:</strong> Jos olet pitänyt yli 3 lepopäivää, näet motivoivan viestin kun avaat sovelluksen</li>
+        <li><strong>Huom:</strong> Viestit näkyvät vain kun avaat sivun - emme lähetä oikeita push-ilmoituksia puhelimeen</li>
+      </ul>
+    </div>
+
+    <div style="background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 16px;">
+      <h3 style="color: var(--accent); margin-top: 0;">🌐 Yhteisö ja näkyvyys</h3>
+      <ul style="margin: 12px 0;">
+        <li><strong>Profiili:</strong> Kun kirjaudut sisään, muut käyttäjät näkevät nimesi ja profiilikuvasi</li>
+        <li><strong>Suorittajat:</strong> Näet ketkä muut ovat suorittaneet saman päivän</li>
+        <li><strong>Kannustus:</strong> Ole osa yhteisöä ja inspiroi muita suoriutumalla!</li>
+      </ul>
+    </div>
+
+    <div style="background: linear-gradient(135deg, #1c2b20, var(--card)); border-radius: 16px; padding: 20px; border: 2px solid var(--accent);">
+      <h3 style="color: var(--accent); margin-top: 0;">💪 Aloita haaste nyt!</h3>
+      <p>Klikkaa "Nykyinen haaste" -välilehteä aloittaaksesi. Haaste kasvattaa kuntosi asteittain - aloitat kevyesti ja joka päivä teet vähän enemmän. Lopulta pystyt tekemään 30 punnerrusta ja 50 vatsalihasliikettä yhdellä suorituksella!</p>
+      <p style="margin-top: 12px;"><strong>Ota haaste vastaan ja ylitä itsesi!</strong> 🔥</p>
     </div>
   </div>
 
@@ -1436,38 +1494,60 @@
       // Rest day (no completion) doesn't break streak, continue counting
     }
     
-    // Calculate consecutive workout days (success or failed) without rest
+    // Calculate consecutive workout days and rest days since last workout
     let consecutiveDays = 0;
+    let restDaysSinceLastWorkout = 0;
     
-    // Count backwards from yesterday to find consecutive workout days
-    for (let dayOffset = 1; dayOffset <= challenge2Plan.length; dayOffset++) {
-      const checkDate = new Date(finlandTime);
-      checkDate.setDate(checkDate.getDate() - dayOffset);
+    // Find the most recent workout and calculate days since
+    let lastWorkoutDate = null;
+    for (let i = 0; i < challenge2Plan.length; i++) {
+      const dayUsers = progress[`day-${i}`] || {};
+      const currentUserData = currentUser ? dayUsers[currentUser.uid] : dayUsers['local'];
       
-      // Find if any day was completed on this date
-      let foundCompletion = false;
-      for (let i = 0; i < challenge2Plan.length; i++) {
-        const dayUsers = progress[`day-${i}`] || {};
-        const currentUserData = currentUser ? dayUsers[currentUser.uid] : dayUsers['local'];
-        
-        if (currentUserData && currentUserData.timestamp) {
-          const completionDate = currentUserData.timestamp.toDate ? currentUserData.timestamp.toDate() : new Date(currentUserData.timestamp);
-          const completionDay = new Date(completionDate.getTime() + (2 * 60 * 60 * 1000));
-          
-          if (completionDay.getUTCFullYear() === checkDate.getUTCFullYear() &&
-              completionDay.getUTCMonth() === checkDate.getUTCMonth() &&
-              completionDay.getUTCDate() === checkDate.getUTCDate()) {
-            foundCompletion = true;
-            break;
-          }
+      if (currentUserData && currentUserData.timestamp) {
+        const completionDate = currentUserData.timestamp.toDate ? currentUserData.timestamp.toDate() : new Date(currentUserData.timestamp);
+        if (!lastWorkoutDate || completionDate > lastWorkoutDate) {
+          lastWorkoutDate = completionDate;
         }
       }
+    }
+    
+    // Calculate days since last workout
+    if (lastWorkoutDate) {
+      const lastWorkoutFinland = new Date(lastWorkoutDate.getTime() + (2 * 60 * 60 * 1000));
+      const daysSince = Math.floor((finlandTime - lastWorkoutFinland) / MS_PER_DAY);
+      restDaysSinceLastWorkout = daysSince;
       
-      if (foundCompletion) {
-        consecutiveDays++;
-      } else {
-        break; // Rest day found, stop counting
+      // Count consecutive days from that workout backwards
+      for (let dayOffset = 1; dayOffset <= 60; dayOffset++) {
+        const checkDate = new Date(lastWorkoutFinland);
+        checkDate.setDate(checkDate.getDate() - dayOffset);
+        
+        let foundCompletion = false;
+        for (let i = 0; i < challenge2Plan.length; i++) {
+          const dayUsers = progress[`day-${i}`] || {};
+          const currentUserData = currentUser ? dayUsers[currentUser.uid] : dayUsers['local'];
+          
+          if (currentUserData && currentUserData.timestamp) {
+            const completionDate = currentUserData.timestamp.toDate ? currentUserData.timestamp.toDate() : new Date(currentUserData.timestamp);
+            const completionDay = new Date(completionDate.getTime() + (2 * 60 * 60 * 1000));
+            
+            if (completionDay.getUTCFullYear() === checkDate.getUTCFullYear() &&
+                completionDay.getUTCMonth() === checkDate.getUTCMonth() &&
+                completionDay.getUTCDate() === checkDate.getUTCDate()) {
+              foundCompletion = true;
+              break;
+            }
+          }
+        }
+        
+        if (foundCompletion) {
+          consecutiveDays++;
+        } else {
+          break;
+        }
       }
+      consecutiveDays++; // Include the last workout day itself
     }
     
     // Find first incomplete or failed day for current user
@@ -1511,6 +1591,18 @@
         <div style="font-size: 14px; opacity: 0.9;">Muista pitää välillä lepopäivä. Palautuminen on tärkeä osa kehitystä!</div>
       `;
       list.appendChild(reminder);
+    }
+    
+    // Show motivational push message if 3+ rest days since last workout
+    if (restDaysSinceLastWorkout > 3 && todayIndex < challenge2Plan.length) {
+      const pushDiv = document.createElement("div");
+      pushDiv.style.cssText = "margin-bottom: 20px; padding: 16px; background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%); border-radius: 12px; color: white; text-align: center;";
+      pushDiv.innerHTML = `
+        <div style="font-size: 24px; margin-bottom: 8px;">💪</div>
+        <div style="font-weight: bold; margin-bottom: 4px;">Hei, missä sinä olet?</div>
+        <div style="font-size: 14px; opacity: 0.9;">Olet jo levännyt ${restDaysSinceLastWorkout} päivän ajan. On aika palata haasteen pariin! Joka askeleella pääset lähemmäs tavoitettasi!</div>
+      `;
+      list.appendChild(pushDiv);
     }
     
     let currentWeek = 0;
@@ -1621,14 +1713,24 @@
           }
         }
       } else if (isToday && hasCompletedToday) {
-        html += `<div style="margin-top: 12px; padding: 10px; background: var(--card-soft); border-radius: 8px; color: var(--muted); font-size: 14px;">
-          ⏸️ Olet jo tehnyt suorituksen tänään. Voit jatkaa haastetta huomenna!
-        </div>`;
-      } else if (!isToday && !isFuture && isCompletedToday) {
-        // Show undo button for days completed today (even if they're no longer "today")
-        html += `<div class="actions">
-          <button class="undo-btn" onclick="challenge2Undo(${i})">Kumoa</button>
-        </div>`;
+        // Check if the completion was a failure
+        if (currentUserData && currentUserData.status === 'failed') {
+          html += `<div class="actions">
+            <button class="fail-btn" onclick="openChallenge2Fail(${i})">Muokkaa tuloksia</button>
+            <button class="undo-btn" onclick="challenge2Undo(${i})">Kumoa</button>
+          </div>`;
+        } else {
+          html += `<div style="margin-top: 12px; padding: 10px; background: var(--card-soft); border-radius: 8px; color: var(--muted); font-size: 14px;">
+            ⏸️ Olet jo tehnyt suorituksen tänään. Voit jatkaa haastetta huomenna!
+          </div>`;
+        }
+      } else if (!isToday && !isFuture && currentUserData) {
+        // Show undo button for any day that has been completed or failed
+        if (isCompletedToday || currentUserData.status === 'failed') {
+          html += `<div class="actions">
+            <button class="undo-btn" onclick="challenge2Undo(${i})">Kumoa</button>
+          </div>`;
+        }
       } else if (isFuture) {
         html += `<div style="margin-top: 12px; padding: 10px; background: var(--card-soft); border-radius: 8px; color: var(--muted); font-size: 14px;">
           🔒 Suorita ensin aikaisemmat päivät
