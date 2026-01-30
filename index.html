@@ -1176,12 +1176,20 @@
   window.closeCertificate = closeCertificate;
   window.downloadImage = downloadImage;
 
-  // ===== CHALLENGE 2 LOGIC =====
+  // ===== CHALLENGE 2 =====
   const challenge2Plan = [
-    { p: 10, a: 15 }, { p: 12, a: 18 }, { p: 14, a: 20 }, { p: 16, a: 25 },
-    { p: 12, a: 20 }, { p: 15, a: 22 }, { p: 18, a: 25 }, { p: 20, a: 30 },
-    { p: 15, a: 25 }, { p: 18, a: 28 }, { p: 20, a: 32 }, { p: 25, a: 35 },
-    { p: 18, a: 30 }, { p: 20, a: 32 }, { p: 25, a: 35 }, { p: 30, a: 40 },
+    // Viikko 1 - Alku 7 punnerrusta ja 10 vatsalihasliikettä
+    { p: 7, a: 10 }, { p: 8, a: 12 }, { p: 9, a: 14 }, { p: 10, a: 15 },
+    // Viikko 2
+    { p: 11, a: 17 }, { p: 12, a: 19 }, { p: 13, a: 20 }, { p: 14, a: 22 },
+    // Viikko 3
+    { p: 15, a: 24 }, { p: 16, a: 25 }, { p: 17, a: 27 }, { p: 18, a: 29 },
+    // Viikko 4
+    { p: 19, a: 30 }, { p: 20, a: 32 }, { p: 21, a: 34 }, { p: 22, a: 35 },
+    // Viikko 5
+    { p: 23, a: 37 }, { p: 24, a: 39 }, { p: 25, a: 40 }, { p: 26, a: 42 },
+    // Viikko 6 - Loppu 30 punnerrusta ja 50 vatsaa
+    { p: 27, a: 44 }, { p: 28, a: 45 }, { p: 29, a: 47 }, { p: 30, a: 50 },
   ];
 
   const challenge2StartDate = new Date("2026-01-29");
@@ -1594,7 +1602,7 @@
       if (isToday && !hasCompletedToday) {
         if (!currentUserData) {
           html += `<div class="actions">
-            <button class="success-btn" onclick="challenge2CompleteSuccess(${i})">✅ Suoritettu</button>
+            <button class="success-btn" onclick="challenge2CompleteSuccess(${i})">✅ Suorita!</button>
             <button class="fail-btn" onclick="openChallenge2Fail(${i})">❌ Epäonnistui</button>
           </div>`;
         } else if (currentUserData.status === 'failed') {
@@ -1607,7 +1615,7 @@
           } else {
             html += `<div style="margin-top: 8px; color: var(--accent); font-weight: bold;">🔄 Yritä uudelleen</div>`;
             html += `<div class="actions">
-              <button class="success-btn" onclick="challenge2CompleteSuccess(${i})">✅ Suoritettu</button>
+              <button class="success-btn" onclick="challenge2CompleteSuccess(${i})">✅ Suorita!</button>
               <button class="fail-btn" onclick="openChallenge2Fail(${i})">❌ Epäonnistui</button>
             </div>`;
           }
