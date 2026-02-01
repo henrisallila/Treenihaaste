@@ -523,42 +523,6 @@
 
 
 
-  <div style="position: absolute; top: 20px; right: 20px;">
-    <button id="show-auth" class="auth-btn" style="background: var(--accent); color: #000; opacity: 0; transition: opacity 0.2s;">Kirjaudu</button>
-  </div>
-  
-
-  
-  <div id="auth-section" class="auth-section auth-loading" style="display: none;">
-    <p id="login-instruction" style="margin: 8px 0; color: var(--muted); font-size: 14px;">Huom! Kaikki muut kirjautuneet käyttäjät näkevät, nimesi, profiilikuvasi ja tekemäsi treenit. Kirjautumalla hyväksyt tietojen tallentamisen, ja profiilikuvasi näkymisen muille käyttäjille.</p>
-    <div id="login-form">
-      <button id="google-login" class="auth-btn google-btn">
-        Google tili
-      </button>
-      <button id="email-login" class="auth-btn">
-        Muu sähköposti
-      </button>
-    </div>
-
-    <div id="email-form" style="display: none; margin-bottom: 16px;">
-      <input type="email" id="email" placeholder="Sähköposti" style="width: 100%; padding: 8px; margin-bottom: 8px; border-radius: 6px; border: 1px solid var(--muted); background: var(--card); color: var(--text);">
-      <input type="password" id="password" placeholder="Salasana" style="width: 100%; padding: 8px; margin-bottom: 8px; border-radius: 6px; border: 1px solid var(--muted); background: var(--card); color: var(--text);">
-      <div style="display: flex; gap: 8px;">
-        <button id="signin-btn" class="auth-btn" style="background: var(--accent); color: #000; flex: 1;">Kirjaudu</button>
-        <button id="signup-btn" class="auth-btn" style="background: transparent; border: 1px solid var(--accent); color: var(--accent); flex: 1;">Rekisteröidy</button>
-      </div>
-    </div>
-
-    
-      
-    <div id="user-info" class="user-info" style="display: none;">
-      <img id="user-avatar" class="user-avatar" src="" alt="">
-      <div id="user-name"></div>
-      <button id="logout" class="logout-btn">Kirjaudu ulos</button>
-    </div>
-  </div>
-
-    <h1>💪 Treenihaasteet</h1>
   
   <div class="nav-tabs">
     <button class="nav-tab active" data-tab="current">Nykyinen haaste</button>
@@ -569,14 +533,49 @@
   <div id="current" class="tab-content active">
     <h2 style="margin-top: 0;">💪 One-shot haaste</h2>
     
+    <!-- Account creation blocked notice -->
+    <div id="account-blocked" style="display: none; opacity: 0; transition: opacity 0.2s; text-align: center; padding: 40px 20px; background: var(--card); border-radius: 16px; margin: 20px 0;">
+      <div style="font-size: 48px; margin-bottom: 16px;">🚫</div>
+      <h3 style="color: var(--danger); margin-bottom: 12px;">Tilin luominen ei ole mahdollista</h3>
+      <p style="color: var(--muted); margin-bottom: 20px;">Tämä sovellus on suljettu uusilta käyttäjiltä. Jos tämä on mielestäsi virhe, tiedät keneen olla yhteydessä.</p>
+    </div>
+    
     <!-- Login required notice -->
     <div id="login-required" style="display: none; opacity: 0; transition: opacity 0.2s; text-align: center; padding: 40px 20px; background: var(--card); border-radius: 16px; margin: 20px 0;">
       <div style="font-size: 48px; margin-bottom: 16px;">🔒</div>
       <h3 style="color: var(--accent); margin-bottom: 12px;">Kirjautuminen vaaditaan</h3>
       <p style="color: var(--muted); margin-bottom: 20px;">Sinun täytyy kirjautua sisään aloittaaksesi One-shot haasteen. Kirjautumalla varmistat että edistymisesi tallennetaan turvallisesti pilveen.</p>
-      <button onclick="document.getElementById('show-auth').click()" style="padding: 12px 24px; background: var(--accent); color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px;">
+      <button id="login-required-btn" onclick="openAuthSection()" style="padding: 12px 24px; background: var(--accent); color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px;">
         Kirjaudu sisään
       </button>
+      <div id="auth-section" class="auth-section auth-loading" style="display: none; margin-top: 16px;">
+        <p id="login-instruction" style="margin: 8px 0; color: var(--muted); font-size: 14px;">Huom! Kaikki muut kirjautuneet käyttäjät näkevät, nimesi, profiilikuvasi ja tekemäsi treenit. Kirjautumalla hyväksyt tietojen tallentamisen, ja profiilikuvasi näkymisen muille käyttäjille.</p>
+        <div id="login-form">
+          <button id="google-login" class="auth-btn google-btn">
+            Google tili
+          </button>
+          <button id="email-login" class="auth-btn">
+            Muu sähköposti
+          </button>
+        </div>
+
+        <div id="email-form" style="display: none; margin-bottom: 16px;">
+          <input type="email" id="email" placeholder="Sähköposti" style="width: 100%; padding: 8px; margin-bottom: 8px; border-radius: 6px; border: 1px solid var(--muted); background: var(--card); color: var(--text);">
+          <input type="password" id="password" placeholder="Salasana" style="width: 100%; padding: 8px; margin-bottom: 8px; border-radius: 6px; border: 1px solid var(--muted); background: var(--card); color: var(--text);">
+          <div style="display: flex; gap: 8px;">
+            <button id="signin-btn" class="auth-btn" style="background: var(--accent); color: #000; flex: 1;">Kirjaudu</button>
+            <button id="signup-btn" class="auth-btn" style="background: transparent; border: 1px solid var(--accent); color: var(--accent); flex: 1; opacity: 0.5; cursor: not-allowed;" disabled>Rekisteröidy</button>
+          </div>
+          <div style="font-size: 12px; color: var(--muted); text-align: center; margin-top: 8px;">Uusien käyttäjien rekisteröinti ei ole tällä hetkellä käytössä</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="user-info" class="user-info" style="display: none;">
+      <img id="user-avatar" class="user-avatar" src="" alt="">
+      <div id="user-name"></div>
+      <button id="logout" class="logout-btn">Kirjaudu ulos</button>
     </div>
     
     <div id="challenge2-list"></div>
@@ -736,6 +735,67 @@
     return Math.floor(i / 7) + 1;
   }
 
+  function getEmailFirstName(email) {
+    if (!email) return '';
+    const localPart = email.split('@')[0] || '';
+    if (!localPart) return '';
+    const base = localPart.split('+')[0];
+    const parts = base.split('.').filter(Boolean);
+    const clean = (value) => value.replace(/[^a-zA-ZÅÄÖåäö]/g, '');
+    const candidates = (parts.length ? parts : [base])
+      .map(clean)
+      .filter((value) => value.length >= 3);
+
+    if (candidates.length === 0) {
+      const cleaned = clean(base);
+      return cleaned.length >= 3 ? cleaned : '';
+    }
+
+    let shortest = candidates[0];
+    candidates.forEach((value) => {
+      if (value.length < shortest.length) shortest = value;
+    });
+    return shortest;
+  }
+
+  function getUserFirstName(user) {
+    if (!user) return 'Käyttäjä';
+    const displayName = (user.displayName || '').trim();
+    if (displayName) {
+      const firstName = displayName.split(/\s+/)[0];
+      if (firstName) return firstName;
+    }
+
+    const emailName = getEmailFirstName(user.email || '');
+    if (emailName) return emailName.charAt(0).toUpperCase() + emailName.slice(1);
+    return 'Käyttäjä';
+  }
+
+  function getInitialAvatar(name) {
+    const trimmed = (name || '').trim();
+    const letter = trimmed ? trimmed.charAt(0).toUpperCase() : '👤';
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#007acc"/><text x="16" y="20" text-anchor="middle" fill="white" font-size="14">${letter}</text></svg>`;
+    return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  }
+
+  function getStoredNameFirstName(name) {
+    const trimmed = (name || '').trim();
+    if (!trimmed) return 'Käyttäjä';
+    if (trimmed.includes('@')) {
+      const emailName = getEmailFirstName(trimmed);
+      if (emailName) return emailName.charAt(0).toUpperCase() + emailName.slice(1);
+    }
+    return trimmed.split(/\s+/)[0] || 'Käyttäjä';
+  }
+
+  function normalizeAvatar(avatarUrl, name) {
+    if (!avatarUrl) return getInitialAvatar(name);
+    if (avatarUrl.startsWith('data:image/svg+xml;base64') || avatarUrl.startsWith('data:image/svg+xml;utf8')) {
+      return getInitialAvatar(name);
+    }
+    return avatarUrl;
+  }
+
   async function saveProgress(dayIndex, completed) {
     if (currentUser && isFirebaseConfigured) {
       try {
@@ -744,8 +804,8 @@
           await setDoc(completionDoc, {
             userId: currentUser.uid,
             dayIndex,
-            avatar: currentUser.photoURL || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNiIgZmlsbD0iIzAwN2FjYyIvPjx0ZXh0IHg9IjE2IiB5PSIyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMTQiPkA8L3RleHQ+PC9zdmc+',
-            name: currentUser.displayName || currentUser.email,
+            avatar: currentUser.photoURL || getInitialAvatar(getUserFirstName(currentUser)),
+            name: getUserFirstName(currentUser),
             timestamp: new Date()
           });
         } else {
@@ -786,7 +846,7 @@
             const dayKey = `day-${data.dayIndex}`;
             if (!progress[dayKey]) progress[dayKey] = {};
             progress[dayKey][data.userId] = {
-              avatar: data.avatar,
+              avatar: normalizeAvatar(data.avatar, getStoredNameFirstName(data.name)),
               name: data.name
             };
           }
@@ -929,7 +989,9 @@
           const pos = positions[dayRandom[index % positions.length]];
           const rotation = Math.floor(((i + index) * 7919 + 31337) % 21) - 10;
           const style = Object.entries(pos).map(([key, value]) => `${key}: ${value}`).join('; ') + `; transform: rotate(${rotation}deg)`;
-          html += `<div class="user-stamp" style="${style}; background-image: url(${user.avatar || user.userAvatar})"></div>`;
+          const userName = getStoredNameFirstName(user.name);
+          const avatar = normalizeAvatar(user.avatar || user.userAvatar, userName);
+          html += `<div class="user-stamp" style="${style}; background-image: url(${avatar})"></div>`;
         });
         html += `</div>`;
       }
@@ -963,15 +1025,7 @@
   }
 
   async function signUpWithEmail() {
-    if (!isFirebaseConfigured) return;
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-      console.error('Email sign up error:', error);
-      alert('Rekisteröinti epäonnistui: ' + error.message);
-    }
+    alert('Uusien käyttäjien rekisteröinti ei ole tällä hetkellä käytössä.');
   }
 
   async function handleSignOut() {
@@ -983,20 +1037,45 @@
     }
   }
 
+  function openAuthSection() {
+    const authSection = document.getElementById('auth-section');
+    const loginForm = document.getElementById('login-form');
+    const emailForm = document.getElementById('email-form');
+    const loginInstruction = document.getElementById('login-instruction');
+    const accountBlocked = document.getElementById('account-blocked');
+    const loginRequired = document.getElementById('login-required');
+    const loginRequiredBtn = document.getElementById('login-required-btn');
+
+    if (accountBlocked) {
+      accountBlocked.style.display = 'none';
+      accountBlocked.style.opacity = '0';
+    }
+
+    if (loginRequired) {
+      loginRequired.style.display = 'block';
+      loginRequired.style.opacity = '1';
+    }
+    if (loginRequiredBtn) loginRequiredBtn.style.display = 'none';
+
+    if (authSection) authSection.style.display = 'block';
+    if (loginForm) loginForm.style.display = 'flex';
+    if (emailForm) emailForm.style.display = 'none';
+    if (loginInstruction) loginInstruction.style.display = 'block';
+  }
+
   function updateAuthUI(user) {
     const authSection = document.getElementById('auth-section');
     const loginForm = document.getElementById('login-form');
     const emailForm = document.getElementById('email-form');
     const userInfo = document.getElementById('user-info');
-    const showBtn = document.getElementById('show-auth');
     const loginInstruction = document.getElementById('login-instruction');
+    const loginRequiredBtn = document.getElementById('login-required-btn');
     
     // Poistetaan loading-tila kun autentikaatio on tarkistettu
     authSection.classList.remove('auth-loading');
     
     if (!isFirebaseConfigured) {
       authSection.style.display = 'none';
-      showBtn.style.display = 'none';
       return;
     }
     
@@ -1005,29 +1084,19 @@
       loginForm.style.display = 'none';
       emailForm.style.display = 'none';
       userInfo.style.display = 'flex';
-      showBtn.style.display = 'none';
-      showBtn.style.opacity = '0';
       loginInstruction.style.display = 'none';
-      document.getElementById('user-name').textContent = user.displayName || user.email;
+      if (loginRequiredBtn) loginRequiredBtn.style.display = 'none';
+      document.getElementById('user-name').textContent = getUserFirstName(user);
       document.getElementById('user-avatar').src = user.photoURL || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="%23666"/><text x="16" y="20" text-anchor="middle" fill="white" font-size="14">👤</text></svg>';
     } else {
       authSection.style.display = 'none';
-      showBtn.style.display = 'block';
-      showBtn.style.opacity = '1';
       loginForm.style.display = 'flex';
       emailForm.style.display = 'none';
       userInfo.style.display = 'none';
       loginInstruction.style.display = 'block';
+      if (loginRequiredBtn) loginRequiredBtn.style.display = 'inline-block';
     }
   }
-
-  // Show/hide auth section
-  document.getElementById('show-auth').addEventListener('click', () => {
-    const authSection = document.getElementById('auth-section');
-    const showBtn = document.getElementById('show-auth');
-    authSection.style.display = 'block';
-    showBtn.style.display = 'none';
-  });
 
   // Show email form
   document.getElementById('email-login').addEventListener('click', () => {
@@ -1044,7 +1113,61 @@
   // Auth state listener
   if (isFirebaseConfigured) {
     onAuthStateChanged(auth, async (user) => {
+      console.log('=== onAuthStateChanged triggered ===', user ? user.email : 'null');
       currentUser = user;
+      
+      // Check if user was created on or after Feb 1, 2026
+      if (user) {
+        try {
+          console.log('User metadata:', user.metadata);
+          const userCreationTime = new Date(user.metadata.creationTime);
+          console.log('User creation time:', userCreationTime, 'ISO:', userCreationTime.toISOString());
+          
+          // Compare by date only (year, month, day)
+          const creationYear = userCreationTime.getUTCFullYear();
+          const creationMonth = userCreationTime.getUTCMonth();
+          const creationDay = userCreationTime.getUTCDate();
+          
+          // Feb 1, 2026
+          const cutoffYear = 2026;
+          const cutoffMonth = 1; // 0 = January, 1 = February
+          const cutoffDay = 1;
+          
+          console.log(`Created: ${creationYear}-${String(creationMonth).padStart(2,'0')}-${String(creationDay).padStart(2,'0')}, Cutoff: ${cutoffYear}-${String(cutoffMonth).padStart(2,'0')}-${String(cutoffDay).padStart(2,'0')}`);
+          
+          const isCreatedOnOrAfterCutoff = 
+            creationYear > cutoffYear ||
+            (creationYear === cutoffYear && creationMonth > cutoffMonth) ||
+            (creationYear === cutoffYear && creationMonth === cutoffMonth && creationDay >= cutoffDay);
+          
+          console.log('Is too new (>= Feb 1):', isCreatedOnOrAfterCutoff);
+          
+          if (isCreatedOnOrAfterCutoff) {
+            // User is too new, log them out
+            console.log('>>> BLOCKING NEW USER <<<');
+            await signOut(auth);
+            currentUser = null;
+            
+            // Show blocked message
+            const blockedDiv = document.getElementById('account-blocked');
+            const loginRequiredDiv = document.getElementById('login-required');
+            const challenge2List = document.getElementById('challenge2-list');
+            
+            if (blockedDiv) {
+              blockedDiv.style.display = 'block';
+              blockedDiv.style.opacity = '1';
+            }
+            if (loginRequiredDiv) loginRequiredDiv.style.display = 'none';
+            if (challenge2List) challenge2List.style.display = 'none';
+            
+            updateAuthUI(null);
+            return;
+          }
+        } catch (error) {
+          console.error('Error checking user creation date:', error);
+        }
+      }
+      
       updateAuthUI(user);
       
       if (unsubscribe) unsubscribe();
@@ -1061,8 +1184,8 @@
                 await setDoc(completionDoc, {
                   userId: user.uid,
                   dayIndex: i,
-                  avatar: user.photoURL || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNiIgZmlsbD0iIzAwN2FjYyIvPjx0ZXh0IHg9IjE2IiB5PSIyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMTQiPkA8L3RleHQ+PC9zdmc+',
-                  name: user.displayName || user.email,
+                  avatar: user.photoURL || getInitialAvatar(getUserFirstName(user)),
+                  name: getUserFirstName(user),
                   timestamp: new Date()
                 });
               }
@@ -1085,8 +1208,8 @@
                 status: data.status,
                 pushups: data.pushups || 0,
                 situps: data.situps || 0,
-                avatar: user.photoURL || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNiIgZmlsbD0iIzAwN2FjYyIvPjx0ZXh0IHg9IjE2IiB5PSIyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMTQiPkA8L3RleHQ+PC9zdmc+',
-                name: user.displayName || user.email,
+                avatar: user.photoURL || getInitialAvatar(getUserFirstName(user)),
+                name: getUserFirstName(user),
                 timestamp: new Date()
               });
             } catch (error) {
@@ -1121,6 +1244,7 @@
   // Make functions global for onclick handlers
   window.complete = complete;
   window.undo = undo;
+  window.openAuthSection = openAuthSection;
   
   // Certificate functions
   async function showCertificate() {
@@ -1143,7 +1267,7 @@
       }
     });
     
-    const userName = currentUser ? (currentUser.displayName || currentUser.email) : 'Käyttäjä';
+    const userName = getUserFirstName(currentUser);
     
     const statsHtml = `
       <div><strong>Suoritetut päivät:</strong> ${completedDays} / 15</div>
@@ -1182,7 +1306,7 @@
       }
     });
     
-    const userName = currentUser ? (currentUser.displayName || currentUser.email) : 'Käyttäjä';
+    const userName = getUserFirstName(currentUser);
     
     // Create canvas
     const canvas = document.createElement('canvas');
@@ -1269,8 +1393,8 @@
           status,
           pushups: data.pushups || 0,
           situps: data.situps || 0,
-          avatar: currentUser.photoURL || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNiIgZmlsbD0iIzAwN2FjYyIvPjx0ZXh0IHg9IjE2IiB5PSIyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMTQiPkA8L3RleHQ+PC9zdmc+',
-          name: currentUser.displayName || currentUser.email,
+          avatar: currentUser.photoURL || getInitialAvatar(getUserFirstName(currentUser)),
+          name: getUserFirstName(currentUser),
           timestamp: new Date()
         });
         challenge2ProgressCache = null;
@@ -1309,7 +1433,7 @@
             status: data.status,
             pushups: data.pushups || 0,
             situps: data.situps || 0,
-            avatar: data.avatar,
+            avatar: normalizeAvatar(data.avatar, getStoredNameFirstName(data.name)),
             name: data.name,
             timestamp: data.timestamp
           };
@@ -1569,6 +1693,56 @@
     
     list.innerHTML = "";
     
+    // Calculate stats: total pushups and situps (successful + failed)
+    let totalPushups = 0;
+    let totalSitups = 0;
+    let completedDays = 0;
+    
+    for (let i = 0; i < challenge2Plan.length; i++) {
+      const dayUsers = progress[`day-${i}`] || {};
+      const currentUserData = currentUser ? dayUsers[currentUser.uid] : dayUsers['local'];
+      
+      if (currentUserData) {
+        if (currentUserData.status === 'success') {
+          totalPushups += challenge2Plan[i].p;
+          totalSitups += challenge2Plan[i].a;
+          completedDays++;
+        } else if (currentUserData.status === 'failed') {
+          totalPushups += (currentUserData.pushups || 0);
+          totalSitups += (currentUserData.situps || 0);
+        }
+      }
+    }
+    
+    // Calculate estimated calories burned
+    // Approximation: pushups ~0.33 kcal each, situps ~0.2 kcal each
+    const estimatedCalories = Math.round(totalPushups * 0.33 + totalSitups * 0.2);
+    
+    // Show stats card
+    if (totalPushups > 0 || totalSitups > 0) {
+      const statsDiv = document.createElement("div");
+      statsDiv.style.cssText = "margin-bottom: 20px; padding: 16px; background: linear-gradient(135deg, #1c2b20 0%, var(--card) 100%); border-radius: 12px; border: 2px solid var(--accent); text-align: center;";
+      statsDiv.innerHTML = `
+        <div style="font-size: 24px; margin-bottom: 12px;">📊 Haasteen aikana olet tehnyt</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+          <div style="padding: 10px; background: var(--card-soft); border-radius: 8px;">
+            <div style="font-size: 28px; font-weight: bold; color: var(--accent);">${totalPushups}</div>
+            <div style="font-size: 12px; color: var(--muted);">Punnerrusta</div>
+          </div>
+          <div style="padding: 10px; background: var(--card-soft); border-radius: 8px;">
+            <div style="font-size: 28px; font-weight: bold; color: var(--accent);">${totalSitups}</div>
+            <div style="font-size: 12px; color: var(--muted);">Vatsaa</div>
+          </div>
+        </div>
+    
+        <div style="padding: 10px; background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); border-radius: 8px; color: #000;">
+          <div style="font-size: 20px; font-weight: bold;">🔥 ${estimatedCalories} kcal</div>
+          <div style="font-size: 12px; opacity: 0.8;">Kaloreita poltettu arviolta</div>
+        </div>
+      `;
+      list.appendChild(statsDiv);
+    }
+    
     // Show streak if >= 2
     if (streak >= 2) {
       const streakDiv = document.createElement("div");
@@ -1670,7 +1844,7 @@
         html += `<div style="margin-top: 12px; padding: 10px; background: var(--card-soft); border-radius: 8px; font-size: 14px;">`;
         html += `<div style="font-weight: bold; margin-bottom: 6px; color: var(--accent);">Suorittajat:</div>`;
         Object.values(dayUsers).forEach(user => {
-          const userName = user.name || 'Käyttäjä';
+          const userName = getStoredNameFirstName(user.name);
           if (user.status === 'success') {
             html += `<div style="margin: 4px 0;">✅ ${userName}</div>`;
           } else if (user.status === 'failed') {
