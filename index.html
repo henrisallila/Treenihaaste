@@ -1116,7 +1116,7 @@
       console.log('=== onAuthStateChanged triggered ===', user ? user.email : 'null');
       currentUser = user;
       
-      // Check if user was created on or after Feb 1, 2026
+      // Check if user was created after Feb 1, 2026
       if (user) {
         try {
           console.log('User metadata:', user.metadata);
@@ -1128,21 +1128,21 @@
           const creationMonth = userCreationTime.getUTCMonth();
           const creationDay = userCreationTime.getUTCDate();
           
-          // Feb 1, 2026
+          // Feb 1, 2026 (allow this date)
           const cutoffYear = 2026;
           const cutoffMonth = 1; // 0 = January, 1 = February
           const cutoffDay = 1;
           
           console.log(`Created: ${creationYear}-${String(creationMonth).padStart(2,'0')}-${String(creationDay).padStart(2,'0')}, Cutoff: ${cutoffYear}-${String(cutoffMonth).padStart(2,'0')}-${String(cutoffDay).padStart(2,'0')}`);
           
-          const isCreatedOnOrAfterCutoff = 
+          const isCreatedAfterCutoff = 
             creationYear > cutoffYear ||
             (creationYear === cutoffYear && creationMonth > cutoffMonth) ||
-            (creationYear === cutoffYear && creationMonth === cutoffMonth && creationDay >= cutoffDay);
+            (creationYear === cutoffYear && creationMonth === cutoffMonth && creationDay > cutoffDay);
           
-          console.log('Is too new (>= Feb 1):', isCreatedOnOrAfterCutoff);
+          console.log('Is too new (> Feb 1):', isCreatedAfterCutoff);
           
-          if (isCreatedOnOrAfterCutoff) {
+          if (isCreatedAfterCutoff) {
             // User is too new, log them out
             console.log('>>> BLOCKING NEW USER <<<');
             await signOut(auth);
@@ -1755,8 +1755,8 @@
       list.appendChild(streakDiv);
     }
     
-    // Show rest day reminder if 3+ consecutive days without rest
-    if (consecutiveDays >= 3 && todayIndex < challenge2Plan.length) {
+    // Show rest day reminder only when user trained today (no rest day since last workout)
+    if (consecutiveDays >= 3 && restDaysSinceLastWorkout === 0 && todayIndex < challenge2Plan.length) {
       const reminder = document.createElement("div");
       reminder.style.cssText = "margin-bottom: 20px; padding: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; color: white; text-align: center;";
       reminder.innerHTML = `
