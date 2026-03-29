@@ -511,6 +511,37 @@
       flex: 1;
     }
 
+    .debug-week-btn {
+      margin: 0 0 12px;
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px dashed var(--muted);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .week-success-modal-card {
+      text-align: center;
+      border-color: #ffd700;
+      background: linear-gradient(160deg, #1f1f1f, #151515);
+    }
+
+    .week-success-title {
+      color: #ffd700;
+      font-size: 26px;
+      margin: 0 0 8px;
+    }
+
+    .week-success-text {
+      font-size: 16px;
+      color: var(--text);
+      margin: 0 0 18px;
+    }
+
     :root {
       --accent-blue: #2196F3;
       --warning: #ff9800;
@@ -578,6 +609,7 @@
       <button id="logout" class="logout-btn">Kirjaudu ulos</button>
     </div>
     
+    <button id="debug-week-celebration" class="debug-week-btn" type="button">Testaa viikon juhla (debug)</button>
     <div id="challenge2-list"></div>
 
     <!-- Fail Modal -->
@@ -595,6 +627,19 @@
         <div class="modal-actions">
           <button class="fail-btn" onclick="submitChallenge2Fail()">Tallenna tulokset</button>
           <button class="undo-btn" onclick="closeChallenge2Fail()">Peruuta</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="week-success-modal" class="modal" style="display: none;">
+      <div class="modal-content week-success-modal-card">
+        <div style="font-size: 46px; margin-bottom: 10px;">🎉</div>
+        <h3 class="week-success-title">Onnittelut!</h3>
+        <p class="week-success-text">Suoritit uuden viikon!</p>
+        <p id="week-success-share-preview" style="font-size: 13px; color: var(--muted); margin: 0 0 14px;"></p>
+        <div class="modal-actions">
+          <button class="success-btn" onclick="shareWeekImageToFacebook()">Jaa kuva Facebookiin</button>
+          <button class="success-btn" onclick="closeWeekSuccessModal()">Jatka</button>
         </div>
       </div>
     </div>
@@ -616,7 +661,7 @@
         <li><strong>Lepopäivät:</strong> Voit pitää lepopäiviä ilman että putki katkeaa</li>
         <li><strong>Uudelleen yritys:</strong> Epäonnistumisen jälkeen voit yrittää uudelleen seuraavana päivänä</li>
         <li><strong>Yksi suoritus per päivä:</strong> Voit tehdä vain yhden suorituksen per päivä</li>
-        <li><strong>Päivittäinen nousu:</strong> Punnerrukset nousevat tasaisesti 1 per aktiivinen suorituspäivä</li>
+        <li><strong>Päivittäinen nousu:</strong> Päivittäin +1 punnerrus ja +2 vatsalihasliikettä</li>
       </ul>
     </div>
 
@@ -1196,16 +1241,22 @@
         });
         
         // Sync challenge2 local data to cloud
-        challenge2Plan.forEach(async (_, i) => {
-          const stored = localStorage.getItem(`challenge2-day-${i}`);
-          if (stored) {
+        Object.keys(localStorage)
+          .filter((key) => key.startsWith('challenge2-day-'))
+          .forEach(async (key) => {
+            const stored = localStorage.getItem(key);
+            const dayIndex = parseInt(key.replace('challenge2-day-', ''), 10);
+            if (!stored || Number.isNaN(dayIndex)) return;
+
             try {
               const data = JSON.parse(stored);
-              const completionDoc = doc(db, 'challenge2', `${user.uid}_day-${i}`);
+              const completionDoc = doc(db, 'challenge2', `${user.uid}_day-${dayIndex}`);
+              const hadFailure = Boolean(data.hadFailure) || data.status === 'failed';
               await setDoc(completionDoc, {
                 userId: user.uid,
-                dayIndex: i,
+                dayIndex,
                 status: data.status,
+                hadFailure,
                 pushups: data.pushups || 0,
                 situps: data.situps || 0,
                 avatar: user.photoURL || getInitialAvatar(getUserFirstName(user)),
@@ -1213,10 +1264,9 @@
                 timestamp: new Date()
               });
             } catch (error) {
-              console.error('Challenge2 sync error for day', i, error);
+              console.error('Challenge2 sync error for day', dayIndex, error);
             }
-          }
-        });
+          });
         
         progressCache = null; // Clear cache after sync
         challenge2ProgressCache = null; // Clear challenge2 cache
@@ -1374,23 +1424,105 @@
     { p: 27, a: 44 }, { p: 28, a: 45 }, { p: 29, a: 47 }, { p: 30, a: 50 },
   ];
 
+  const CHALLENGE2_BASE_DAYS = challenge2Plan.length;
+  const CHALLENGE2_WEEK_SIZE = 5;
+
+  function getChallenge2Day(dayIndex) {
+    if (dayIndex < CHALLENGE2_BASE_DAYS) {
+      return challenge2Plan[dayIndex];
+    }
+
+    const lastBaseDay = challenge2Plan[CHALLENGE2_BASE_DAYS - 1];
+    const extraDays = dayIndex - (CHALLENGE2_BASE_DAYS - 1);
+
+    return {
+      p: lastBaseDay.p + extraDays,
+      a: lastBaseDay.a + (extraDays * 2)
+    };
+  }
+
+  function getCurrentUserDataForDay(progress, dayIndex) {
+    const dayUsers = progress[`day-${dayIndex}`] || {};
+    return currentUser ? dayUsers[currentUser.uid] : dayUsers['local'];
+  }
+
+  function getCurrentChallenge2DayIndex(progress) {
+    let dayIndex = 0;
+
+    while (true) {
+      const currentUserData = getCurrentUserDataForDay(progress, dayIndex);
+      if (currentUserData && currentUserData.status === 'success') {
+        dayIndex++;
+        continue;
+      }
+      return dayIndex;
+    }
+  }
+
+  function getHighestCurrentUserDayIndex(progress) {
+    let maxDayIndex = -1;
+
+    Object.keys(progress).forEach((dayKey) => {
+      if (!dayKey.startsWith('day-')) return;
+      const dayIndex = parseInt(dayKey.replace('day-', ''), 10);
+      if (Number.isNaN(dayIndex)) return;
+      const currentUserData = getCurrentUserDataForDay(progress, dayIndex);
+      if (currentUserData && dayIndex > maxDayIndex) {
+        maxDayIndex = dayIndex;
+      }
+    });
+
+    return maxDayIndex;
+  }
+
+  function getHighestOpenedDayIndex(progress) {
+    let maxDayIndex = -1;
+
+    Object.keys(progress).forEach((dayKey) => {
+      if (!dayKey.startsWith('day-')) return;
+      const dayIndex = parseInt(dayKey.replace('day-', ''), 10);
+      if (Number.isNaN(dayIndex)) return;
+
+      const dayUsers = progress[dayKey] || {};
+      const isOpened = Object.values(dayUsers).some((entry) => entry && entry.status === 'success');
+      if (isOpened && dayIndex > maxDayIndex) {
+        maxDayIndex = dayIndex;
+      }
+    });
+
+    return maxDayIndex;
+  }
+
   const challenge2StartDate = new Date("2026-01-29");
   let challenge2FailingDayIndex = null;
   let challenge2ProgressCache = null;
   let challenge2LastCacheTime = 0;
+  let weekCompletionShareText = '';
+  let weekCompletionShareStats = null;
 
   function challenge2WeekForDay(i) {
-    return Math.floor(i / 4) + 1;
+    return Math.floor(i / CHALLENGE2_WEEK_SIZE) + 1;
   }
 
   async function challenge2SaveProgress(dayIndex, status, data = {}) {
     if (currentUser && isFirebaseConfigured) {
       try {
         const completionDoc = doc(db, 'challenge2', `${currentUser.uid}_day-${dayIndex}`);
+        let hadFailure = status === 'failed';
+
+        if (status === 'success') {
+          const existing = await getDoc(completionDoc);
+          if (existing.exists()) {
+            const existingData = existing.data() || {};
+            hadFailure = Boolean(existingData.hadFailure) || existingData.status === 'failed';
+          }
+        }
+
         await setDoc(completionDoc, {
           userId: currentUser.uid,
           dayIndex,
           status,
+          hadFailure,
           pushups: data.pushups || 0,
           situps: data.situps || 0,
           avatar: currentUser.photoURL || getInitialAvatar(getUserFirstName(currentUser)),
@@ -1402,8 +1534,20 @@
         console.error('Challenge2 Save error:', error);
       }
     } else {
+      let hadFailure = status === 'failed';
+      if (status === 'success') {
+        const existing = localStorage.getItem(`challenge2-day-${dayIndex}`);
+        if (existing) {
+          try {
+            const existingData = JSON.parse(existing);
+            hadFailure = Boolean(existingData.hadFailure) || existingData.status === 'failed';
+          } catch {}
+        }
+      }
+
       localStorage.setItem(`challenge2-day-${dayIndex}`, JSON.stringify({
         status,
+        hadFailure,
         pushups: data.pushups || 0,
         situps: data.situps || 0,
         timestamp: new Date().toISOString(),
@@ -1431,6 +1575,7 @@
           if (!progress[dayKey]) progress[dayKey] = {};
           progress[dayKey][data.userId] = {
             status: data.status,
+            hadFailure: Boolean(data.hadFailure) || data.status === 'failed',
             pushups: data.pushups || 0,
             situps: data.situps || 0,
             avatar: normalizeAvatar(data.avatar, getStoredNameFirstName(data.name)),
@@ -1448,15 +1593,18 @@
       }
     } else {
       const progress = {};
-      challenge2Plan.forEach((_, i) => {
-        const stored = localStorage.getItem(`challenge2-day-${i}`);
-        if (stored) {
+      Object.keys(localStorage)
+        .filter((key) => key.startsWith('challenge2-day-'))
+        .forEach((key) => {
+          const stored = localStorage.getItem(key);
+          const dayIndex = parseInt(key.replace('challenge2-day-', ''), 10);
+          if (!stored || Number.isNaN(dayIndex)) return;
           try {
             const data = JSON.parse(stored);
-            progress[`day-${i}`] = { 'local': data };
+            data.hadFailure = Boolean(data.hadFailure) || data.status === 'failed';
+            progress[`day-${dayIndex}`] = { 'local': data };
           } catch {}
-        }
-      });
+        });
       return progress;
     }
   }
@@ -1472,13 +1620,15 @@
     console.log('Checking completions today. Current time:', now.toISOString());
     console.log('Today range (UTC):', todayStart.toISOString(), '-', todayEnd.toISOString());
     
-    for (let i = 0; i < challenge2Plan.length; i++) {
-      const dayUsers = progress[`day-${i}`] || {};
-      const currentUserData = currentUser ? dayUsers[currentUser.uid] : dayUsers['local'];
+    for (const dayKey of Object.keys(progress)) {
+      if (!dayKey.startsWith('day-')) continue;
+      const dayIndex = parseInt(dayKey.replace('day-', ''), 10);
+      if (Number.isNaN(dayIndex)) continue;
+      const currentUserData = getCurrentUserDataForDay(progress, dayIndex);
       
       if (currentUserData && currentUserData.timestamp) {
         const completionDate = currentUserData.timestamp.toDate ? currentUserData.timestamp.toDate() : new Date(currentUserData.timestamp);
-        console.log(`Day ${i} completed at:`, completionDate.toISOString());
+        console.log(`Day ${dayIndex} completed at:`, completionDate.toISOString());
         if (completionDate >= todayStart && completionDate < todayEnd) {
           console.log('Found completion today!');
           return true;
@@ -1506,10 +1656,254 @@
     return failDate >= todayStart && failDate < todayEnd;
   }
 
+  function isWeekEndDay(dayIndex) {
+    return (dayIndex + 1) % CHALLENGE2_WEEK_SIZE === 0;
+  }
+
+  function getChallenge2Stats(progress) {
+    const highestTrackedDay = getHighestCurrentUserDayIndex(progress);
+    let totalPushups = 0;
+    let totalSitups = 0;
+    let currentStreak = 0;
+    let maxStreak = 0;
+
+    for (let i = 0; i <= highestTrackedDay; i++) {
+      const dayData = getCurrentUserDataForDay(progress, i);
+      if (!dayData) continue;
+
+      if (Boolean(dayData.hadFailure) || dayData.status === 'failed') {
+        totalPushups += (dayData.pushups || 0);
+        totalSitups += (dayData.situps || 0);
+        currentStreak = 0;
+        continue;
+      }
+
+      if (dayData.status === 'success') {
+        const target = getChallenge2Day(i);
+        totalPushups += target.p;
+        totalSitups += target.a;
+        currentStreak++;
+        if (currentStreak > maxStreak) {
+          maxStreak = currentStreak;
+        }
+      }
+    }
+
+    const estimatedCalories = Math.round(totalPushups * 0.33 + totalSitups * 0.2);
+    return { totalPushups, totalSitups, estimatedCalories, maxStreak };
+  }
+
+  function buildWeekShareText(stats) {
+    return `Suoritit uuden viikon One-shot haasteessa! 💪\nPunnerruksia yhteensa: ${stats.totalPushups}\nVatsalihasliikkeita yhteensa: ${stats.totalSitups}\nPoltetut kalorit (arvio): ${stats.estimatedCalories} kcal\nPisin putki: ${stats.maxStreak} paivaa`;
+  }
+
+  function buildWeekShareImageDataUrl(stats) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1080;
+    canvas.height = 1080;
+    const ctx = canvas.getContext('2d');
+
+    const bg = ctx.createLinearGradient(0, 0, 1080, 1080);
+    bg.addColorStop(0, '#132017');
+    bg.addColorStop(1, '#0f0f0f');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, 1080, 1080);
+
+    ctx.strokeStyle = '#ffd700';
+    ctx.lineWidth = 10;
+    ctx.strokeRect(36, 36, 1008, 1008);
+
+    ctx.fillStyle = '#ffd700';
+    ctx.font = 'bold 64px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('ONE-SHOT HAASTE', 540, 140);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 56px Arial';
+    ctx.fillText('Uusi viikko suoritettu!', 540, 230);
+
+    ctx.fillStyle = '#eaeaea';
+    ctx.font = '38px Arial';
+    ctx.fillText(`Punnerruksia yhteensa: ${stats.totalPushups}`, 540, 390);
+    ctx.fillText(`Vatsalihasliikkeita yhteensa: ${stats.totalSitups}`, 540, 470);
+    ctx.fillText(`Poltetut kalorit (arvio): ${stats.estimatedCalories} kcal`, 540, 550);
+    ctx.fillText(`Pisin putki: ${stats.maxStreak} paivaa`, 540, 630);
+
+    ctx.fillStyle = '#9a9a9a';
+    ctx.font = '30px Arial';
+    ctx.fillText(`Paivays: ${new Date().toLocaleDateString('fi-FI')}`, 540, 760);
+
+    ctx.fillStyle = '#4caf50';
+    ctx.font = 'bold 34px Arial';
+    ctx.fillText('Treenihaaste', 540, 900);
+
+    return canvas.toDataURL('image/png');
+  }
+
+  function downloadWeekShareImage(dataUrl) {
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = `oneshot-viikko-${new Date().toISOString().slice(0, 10)}.png`;
+    link.click();
+  }
+
+  async function dataUrlToFile(dataUrl, fileName) {
+    const response = await fetch(dataUrl);
+    const blob = await response.blob();
+    return new File([blob], fileName, { type: 'image/png' });
+  }
+
+  function showWeekSuccessModal() {
+    const modal = document.getElementById('week-success-modal');
+    const preview = document.getElementById('week-success-share-preview');
+    if (preview) {
+      preview.textContent = weekCompletionShareText
+        ? `${weekCompletionShareText.replace(/\n/g, ' | ')} `
+        : 'Valmis jakoon: punnerrukset, vatsat, kalorit, pisin putki ja kuva.';
+    }
+    if (modal) modal.style.display = 'flex';
+  }
+
+  function closeWeekSuccessModal() {
+    const modal = document.getElementById('week-success-modal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function launchConfetti() {
+    const canvas = document.createElement('canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.position = 'fixed';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.pointerEvents = 'none';
+    canvas.style.zIndex = '2400';
+    document.body.appendChild(canvas);
+
+    const ctx = canvas.getContext('2d');
+    const colors = ['#ffd700', '#4caf50', '#2196f3', '#ff6b6b', '#ff9800'];
+    const pieces = Array.from({ length: 140 }, () => ({
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * canvas.height * 0.4,
+      w: 6 + Math.random() * 7,
+      h: 8 + Math.random() * 10,
+      vx: (Math.random() - 0.5) * 3,
+      vy: 2 + Math.random() * 3,
+      gravity: 0.05 + Math.random() * 0.06,
+      rotation: Math.random() * Math.PI * 2,
+      vr: (Math.random() - 0.5) * 0.24,
+      color: colors[Math.floor(Math.random() * colors.length)]
+    }));
+
+    const start = performance.now();
+    const duration = 2200;
+
+    function frame(now) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      pieces.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += p.gravity;
+        p.rotation += p.vr;
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      });
+
+      if (now - start < duration) {
+        requestAnimationFrame(frame);
+      } else {
+        canvas.remove();
+      }
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  async function celebrateWeekCompletion(dayIndex) {
+    if (!isWeekEndDay(dayIndex)) return;
+    const progress = await challenge2GetProgress();
+    const stats = getChallenge2Stats(progress);
+    weekCompletionShareStats = stats;
+    weekCompletionShareText = buildWeekShareText(stats);
+    launchConfetti();
+    showWeekSuccessModal();
+  }
+
+  async function testWeekCelebration() {
+    const progress = await challenge2GetProgress();
+    const stats = getChallenge2Stats(progress);
+    weekCompletionShareStats = stats;
+    weekCompletionShareText = buildWeekShareText(stats);
+    launchConfetti();
+    showWeekSuccessModal();
+  }
+
+  async function shareWeekToFacebook() {
+    if (!weekCompletionShareText) {
+      const progress = await challenge2GetProgress();
+      const stats = getChallenge2Stats(progress);
+      weekCompletionShareText = buildWeekShareText(stats);
+    }
+
+    const pageUrl = window.location.href.split('#')[0];
+    const quoteText = weekCompletionShareText.replace(/\n/g, ' | ');
+
+    try {
+      await navigator.clipboard.writeText(weekCompletionShareText);
+      console.log('Facebook-jakoteksti kopioitu leikepoydalle.');
+    } catch (error) {
+      console.warn('Leikepoydakopiointi ei onnistunut:', error);
+    }
+
+    const primaryUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}&quote=${encodeURIComponent(quoteText)}`;
+    const fallbackUrl = `https://m.facebook.com/sharer.php?u=${encodeURIComponent(pageUrl)}&quote=${encodeURIComponent(quoteText)}`;
+
+    const popup = window.open(primaryUrl, '_blank', 'noopener,noreferrer,width=680,height=540');
+    if (!popup) {
+      window.open(fallbackUrl, '_blank');
+    }
+  }
+
+  async function shareWeekImageToFacebook() {
+    if (!weekCompletionShareStats || !weekCompletionShareText) {
+      const progress = await challenge2GetProgress();
+      const stats = getChallenge2Stats(progress);
+      weekCompletionShareStats = stats;
+      weekCompletionShareText = buildWeekShareText(stats);
+    }
+
+    const imageDataUrl = buildWeekShareImageDataUrl(weekCompletionShareStats);
+    const fileName = `oneshot-viikko-${new Date().toISOString().slice(0, 10)}.png`;
+
+    try {
+      const shareFile = await dataUrlToFile(imageDataUrl, fileName);
+      if (navigator.canShare && navigator.canShare({ files: [shareFile] })) {
+        await navigator.share({
+          title: 'One-shot haaste',
+          text: weekCompletionShareText,
+          files: [shareFile]
+        });
+        return;
+      }
+    } catch (error) {
+      console.warn('Suora tiedostojako ei onnistunut:', error);
+    }
+
+    downloadWeekShareImage(imageDataUrl);
+    await shareWeekToFacebook();
+    alert('Kuva ladattiin. Lisaa ladattu kuva Facebook-postaukseen ja liita halutessasi teksti leikepoydalta.');
+  }
+
   async function challenge2CompleteSuccess(i) {
     await challenge2SaveProgress(i, 'success');
     challenge2ProgressCache = null; // Force reload from database
     await challenge2Render();
+    await celebrateWeekCompletion(i);
   }
 
   function openChallenge2Fail(i) {
@@ -1573,49 +1967,48 @@
     
     const progress = await challenge2GetProgress();
     const hasCompletedToday = challenge2HasCompletedToday(progress);
+    const todayIndex = getCurrentChallenge2DayIndex(progress);
+    const highestTrackedDay = getHighestCurrentUserDayIndex(progress);
+    const highestOpenedDay = getHighestOpenedDayIndex(progress);
+
+    const baseVisibleLastDay = CHALLENGE2_BASE_DAYS - 1;
+    const firstPostBaseWeekLastDay = CHALLENGE2_BASE_DAYS + CHALLENGE2_WEEK_SIZE - 1;
+    const weeklyVisibleLastDay = todayIndex + CHALLENGE2_WEEK_SIZE - 1;
+    const communityOpenedWeekLastDay = highestOpenedDay >= CHALLENGE2_BASE_DAYS
+      ? CHALLENGE2_BASE_DAYS + (Math.floor((highestOpenedDay - CHALLENGE2_BASE_DAYS) / CHALLENGE2_WEEK_SIZE) * CHALLENGE2_WEEK_SIZE) + CHALLENGE2_WEEK_SIZE - 1
+      : firstPostBaseWeekLastDay;
+
+    const lastVisibleDayIndex = Math.max(
+      highestTrackedDay,
+      todayIndex < CHALLENGE2_BASE_DAYS ? firstPostBaseWeekLastDay : weeklyVisibleLastDay,
+      communityOpenedWeekLastDay,
+      firstPostBaseWeekLastDay,
+      baseVisibleLastDay
+    );
     
-    // Calculate streak (consecutive successful days, rest days don't break it)
+    // Calculate streak from challenge statuses (success/failed), not calendar dates.
     let streak = 0;
     const now = new Date();
     const finlandTime = new Date(now.getTime() + (2 * 60 * 60 * 1000));
-    
-    // Count backwards from today to find consecutive successful days
-    for (let dayOffset = 0; dayOffset <= challenge2Plan.length; dayOffset++) {
-      const checkDate = new Date(finlandTime);
-      checkDate.setDate(checkDate.getDate() - dayOffset);
-      
-      // Find if any day was completed with success status on this date
-      let foundSuccess = false;
-      let foundFailure = false;
-      
-      for (let i = 0; i < challenge2Plan.length; i++) {
-        const dayUsers = progress[`day-${i}`] || {};
-        const currentUserData = currentUser ? dayUsers[currentUser.uid] : dayUsers['local'];
-        
-        if (currentUserData && currentUserData.timestamp) {
-          const completionDate = currentUserData.timestamp.toDate ? currentUserData.timestamp.toDate() : new Date(currentUserData.timestamp);
-          const completionDay = new Date(completionDate.getTime() + (2 * 60 * 60 * 1000));
-          
-          if (completionDay.getUTCFullYear() === checkDate.getUTCFullYear() &&
-              completionDay.getUTCMonth() === checkDate.getUTCMonth() &&
-              completionDay.getUTCDate() === checkDate.getUTCDate()) {
-            if (currentUserData.status === 'success') {
-              foundSuccess = true;
-            } else if (currentUserData.status === 'failed') {
-              foundFailure = true;
-            }
-            break;
-          }
+
+    const currentDayData = getCurrentUserDataForDay(progress, todayIndex);
+    const currentDayHadFailure = Boolean(currentDayData && currentDayData.hadFailure) || (currentDayData && currentDayData.status === 'failed');
+    if (!currentDayHadFailure) {
+      for (let i = todayIndex - 1; i >= 0; i--) {
+        const dayData = getCurrentUserDataForDay(progress, i);
+
+        if (dayData && (Boolean(dayData.hadFailure) || dayData.status === 'failed')) {
+          break;
         }
-      }
-      
-      if (foundSuccess) {
-        streak++;
-      } else if (foundFailure) {
-        // Failed day breaks the streak
+
+        if (dayData && dayData.status === 'success') {
+          streak++;
+          continue;
+        }
+
+        // Missing completion or explicit failure ends current streak.
         break;
       }
-      // Rest day (no completion) doesn't break streak, continue counting
     }
     
     // Calculate consecutive workout days and rest days since last workout
@@ -1624,9 +2017,11 @@
     
     // Find the most recent workout and calculate days since
     let lastWorkoutDate = null;
-    for (let i = 0; i < challenge2Plan.length; i++) {
-      const dayUsers = progress[`day-${i}`] || {};
-      const currentUserData = currentUser ? dayUsers[currentUser.uid] : dayUsers['local'];
+    for (const dayKey of Object.keys(progress)) {
+      if (!dayKey.startsWith('day-')) continue;
+      const dayIndex = parseInt(dayKey.replace('day-', ''), 10);
+      if (Number.isNaN(dayIndex)) continue;
+      const currentUserData = getCurrentUserDataForDay(progress, dayIndex);
       
       if (currentUserData && currentUserData.timestamp) {
         const completionDate = currentUserData.timestamp.toDate ? currentUserData.timestamp.toDate() : new Date(currentUserData.timestamp);
@@ -1648,9 +2043,11 @@
         checkDate.setDate(checkDate.getDate() - dayOffset);
         
         let foundCompletion = false;
-        for (let i = 0; i < challenge2Plan.length; i++) {
-          const dayUsers = progress[`day-${i}`] || {};
-          const currentUserData = currentUser ? dayUsers[currentUser.uid] : dayUsers['local'];
+        for (const dayKey of Object.keys(progress)) {
+          if (!dayKey.startsWith('day-')) continue;
+          const dayIndex = parseInt(dayKey.replace('day-', ''), 10);
+          if (Number.isNaN(dayIndex)) continue;
+          const currentUserData = getCurrentUserDataForDay(progress, dayIndex);
           
           if (currentUserData && currentUserData.timestamp) {
             const completionDate = currentUserData.timestamp.toDate ? currentUserData.timestamp.toDate() : new Date(currentUserData.timestamp);
@@ -1674,23 +2071,6 @@
       consecutiveDays++; // Include the last workout day itself
     }
     
-    // Find first incomplete or failed day for current user
-    let todayIndex = -1;
-    for (let i = 0; i < challenge2Plan.length; i++) {
-      const dayUsers = progress[`day-${i}`] || {};
-      const currentUserData = currentUser ? dayUsers[currentUser.uid] : dayUsers['local'];
-      
-      if (!currentUserData || currentUserData.status === 'failed') {
-        todayIndex = i;
-        break;
-      }
-    }
-    
-    // If all completed, no "today"
-    if (todayIndex === -1) {
-      todayIndex = challenge2Plan.length; // Beyond last day
-    }
-    
     list.innerHTML = "";
     
     // Calculate stats: total pushups and situps (successful + failed)
@@ -1698,14 +2078,14 @@
     let totalSitups = 0;
     let completedDays = 0;
     
-    for (let i = 0; i < challenge2Plan.length; i++) {
-      const dayUsers = progress[`day-${i}`] || {};
-      const currentUserData = currentUser ? dayUsers[currentUser.uid] : dayUsers['local'];
+    for (let i = 0; i <= highestTrackedDay; i++) {
+      const currentUserData = getCurrentUserDataForDay(progress, i);
+      const dayTarget = getChallenge2Day(i);
       
       if (currentUserData) {
         if (currentUserData.status === 'success') {
-          totalPushups += challenge2Plan[i].p;
-          totalSitups += challenge2Plan[i].a;
+          totalPushups += dayTarget.p;
+          totalSitups += dayTarget.a;
           completedDays++;
         } else if (currentUserData.status === 'failed') {
           totalPushups += (currentUserData.pushups || 0);
@@ -1756,7 +2136,7 @@
     }
     
     // Show rest day reminder only when user trained today (no rest day since last workout)
-    if (consecutiveDays >= 3 && restDaysSinceLastWorkout === 0 && todayIndex < challenge2Plan.length) {
+    if (consecutiveDays >= 3 && restDaysSinceLastWorkout === 0) {
       const reminder = document.createElement("div");
       reminder.style.cssText = "margin-bottom: 20px; padding: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; color: white; text-align: center;";
       reminder.innerHTML = `
@@ -1768,7 +2148,7 @@
     }
     
     // Show motivational push message if 3+ rest days since last workout
-    if (restDaysSinceLastWorkout > 3 && todayIndex < challenge2Plan.length) {
+    if (restDaysSinceLastWorkout > 3) {
       const pushDiv = document.createElement("div");
       pushDiv.style.cssText = "margin-bottom: 20px; padding: 16px; background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%); border-radius: 12px; color: white; text-align: center;";
       pushDiv.innerHTML = `
@@ -1781,7 +2161,8 @@
     
     let currentWeek = 0;
 
-    challenge2Plan.forEach((day, i) => {
+    for (let i = 0; i <= lastVisibleDayIndex; i++) {
+      const day = getChallenge2Day(i);
       const week = challenge2WeekForDay(i);
       if (week !== currentWeek) {
         currentWeek = week;
@@ -1944,15 +2325,24 @@
 
       div.innerHTML = html;
       list.appendChild(div);
-    });
+    }
   }
 
   // Global functions for challenge 2
   window.challenge2CompleteSuccess = challenge2CompleteSuccess;
   window.openChallenge2Fail = openChallenge2Fail;
   window.closeChallenge2Fail = closeChallenge2Fail;
+  window.shareWeekImageToFacebook = shareWeekImageToFacebook;
+  window.closeWeekSuccessModal = closeWeekSuccessModal;
+  window.shareWeekToFacebook = shareWeekToFacebook;
   window.submitChallenge2Fail = submitChallenge2Fail;
+  window.testWeekCelebration = testWeekCelebration;
   window.challenge2Undo = challenge2Undo;
+
+  const debugWeekBtn = document.getElementById('debug-week-celebration');
+  if (debugWeekBtn) {
+    debugWeekBtn.addEventListener('click', testWeekCelebration);
+  }
 
   // Render challenge 2 on init
   challenge2Render();
